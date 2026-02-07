@@ -22,7 +22,7 @@ def main():
 
         pygame.display.update()
 #game variables
-
+tile_size = 200
 
 def drawGrid():
     blockSize = 20 #Set the size of the grid block
@@ -30,4 +30,5 @@ def drawGrid():
         for y in range(0, WINDOW_HEIGHT, blockSize):
             rect = pygame.Rect(x, y, blockSize, blockSize)
             pygame.draw.rect(SCREEN, WHITE, rect, 1)
+
 main()
