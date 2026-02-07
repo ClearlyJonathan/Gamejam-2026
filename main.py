@@ -1,5 +1,5 @@
 import pygame
-import src.playercontroller
+import src.playercontroller as pc
 
 
 # pygame setup do not touch - Just temporarily so i can see my playerr
@@ -14,12 +14,12 @@ FPS = 60
 GROUND_Y = 600
 
 # Don't touch player controller, just modify from here if needed.
-src.playercontroller.W = W
-src.playercontroller.H = H
-src.playercontroller.GROUND_Y = GROUND_Y
-src.playercontroller.GRAVITY = True
-playerA = src.playercontroller.playerA
-playerB = src.playercontroller.playerB
+pc.W = W
+pc.H = H
+pc.GROUND_Y = GROUND_Y
+pc.GRAVITY = True
+playerA = pc.playerA
+playerB = pc.playerB
 
 
 

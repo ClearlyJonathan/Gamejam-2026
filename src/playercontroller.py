@@ -89,7 +89,15 @@ class Player:
     def draw(self, surf):
         pygame.draw.rect(surf, self.color, self.rect)
 
+playerA = Player(
+    x=200, y=500, color=(200, 60, 60),
+    controls={"left": pygame.K_a, "right": pygame.K_d, "jump": pygame.K_w},
+)
 
+playerB = Player(
+    x=900, y=500, color=(60, 120, 220),
+    controls={"left": pygame.K_LEFT, "right": pygame.K_RIGHT, "jump": pygame.K_UP},
+)
 
 
 
