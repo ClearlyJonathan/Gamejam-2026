@@ -6,6 +6,9 @@ from src.level_loader import build_test_level
 from src.stretcher import Stretcher
 from src.level_system import LevelSystem
 
+from src.ldtk_collision_builder import build_ldtk_collision
+
+
 pygame.init()
 
 W, H = 1280, 720
@@ -17,7 +20,7 @@ FPS = 60
 
 # World + level
 world = World(W, H, gravity=1800.0)
-build_test_level(world)  # fills world.solids with Wall objects :contentReference[oaicite:1]{index=1}
+#build_test_level(world)  # fills world.solids with Wall objects :contentReference[oaicite:1]{index=1}
 #hei
 # Make sure the same objects are drawable + selectable
 # (only do this if your loader doesn't already add drawables)
@@ -44,6 +47,7 @@ levels = LevelSystem(
 
 #Laster fÃ¸rste level
 levels.load_level("Level_0")
+build_ldtk_collision(world, levels)
 
 
 
