@@ -17,6 +17,7 @@ import src.playercontroller as pc
 hp_font = pygame.font.Font(None, 28)
 
 
+
 # Music shit
 MENU_MUSIC = "assets/music/New Composition #1.mp3"
 GAME_MUSIC = "assets/music/Jungle and Rainforest Sound Effects - Tropical Forest Ambiences from Costa Rica.mp3"
@@ -71,8 +72,9 @@ stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "src/map2.json",
+    "src/map1.json",
     "assets/tilesetResizeResize.png")
+
 
 #Laster fÃ¸rste level
 levels.load_level("AutoLayers_advanced_demo")
@@ -81,6 +83,7 @@ build_ldtk_collision(world, levels)
 
 
 running = True
+
 while running:
     dt = clock.tick(FPS) / 1000.0
 
@@ -120,6 +123,7 @@ while running:
     # Physics + collision vs world.solids (this is the important part)
     playerA.update(dt, world)  # needs update(dt, world) :contentReference[oaicite:2]{index=2}
     playerB.update(dt, world)
+    # Switch level when both are within 1 player-width of the right edge
 
     # Draw
     screen.fill((20, 22, 28))
@@ -135,6 +139,7 @@ while running:
 
     playerA.draw(screen, hp_font)
     playerB.draw(screen, hp_font)
+
 
     pygame.display.flip()
 
