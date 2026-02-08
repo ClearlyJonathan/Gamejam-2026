@@ -11,6 +11,7 @@ from src.ldtk_collision_builder import build_ldtk_collision
 
 
 pygame.init()
+hp_font = pygame.font.Font(None, 28)
 
 
 # Music shit
@@ -91,7 +92,18 @@ while running:
     keys = pygame.key.get_pressed()
 
     # Stretch selected object (Q/E/Z/C + Shift)
-    stretcher.update(keys)
+    action = stretcher.update(keys)
+
+    if action == "stretch":
+        playerA.take_damage(1)
+    elif action == "shrink":
+        playerB.take_damage(1)
+
+    if playerA.hp == 0 or playerB.hp == 0:
+        game_over = True
+        winner = "B" if playerA.hp == 0 else "A"
+    
+    print(playerA.hp)
 
     # Player input
     playerA.handle_input(keys, dt)
@@ -117,8 +129,8 @@ while running:
     stretcher.draw_gizmo(screen)
     levels.draw(screen)
 
-    playerA.draw(screen)
-    playerB.draw(screen)
+    playerA.draw(screen, hp_font)
+    playerB.draw(screen, hp_font)
 
     pygame.display.flip()
 
