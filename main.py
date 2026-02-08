@@ -1,5 +1,6 @@
 import pygame
 import src.playercontroller as pc
+from src.stretcher import NineSlice
 import src.world as wd
 import src.level_loader as level
 
@@ -31,6 +32,11 @@ playerA = pc.playerA
 playerB = pc.playerB
 
 
+
+# Test
+panel_skin = NineSlice("assets/brick.png", border=16, tile=True)
+panel_rect = pygame.Rect(250, 160, 260, 180)
+
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0  # seconds
@@ -61,6 +67,8 @@ while running:
     for solid in world.solids:
         if hasattr(solid, "draw"):
             solid.draw(screen)
+    
+    panel_skin.draw(screen, panel_rect)
 
     # ground
     pygame.draw.rect(screen, (60, 65, 75), (0, GROUND_Y, W, H - GROUND_Y))
