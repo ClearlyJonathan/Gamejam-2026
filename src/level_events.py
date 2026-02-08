@@ -31,11 +31,14 @@ class LevelEvents:
 
     def check(self, players):
         # First, check killers
-        for p in players:
+        for idx, p in enumerate(players):
             player_rect = p.hitbox
             for k in self.killers:
-                if player_rect.colliderect(k):
+                # be slightly forgiving with killer overlap
+                if player_rect.colliderect(k.inflate(4, 4)):
                     p.hp = 0
+                    print(f"[LevelEvents] Player {idx} touched killer -> hp=0")
+                    break
 
         # Require every player to be overlapping a door (they may share the same door)
         # Debug: report door counts and each player's overlap
