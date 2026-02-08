@@ -17,7 +17,7 @@ GROUND_Y = 600
 pc.W = W
 pc.H = H
 pc.GROUND_Y = GROUND_Y
-pc.GRAVITY = True
+pc.GRAVITY = 1800
 playerA = pc.playerA
 playerB = pc.playerB
 
