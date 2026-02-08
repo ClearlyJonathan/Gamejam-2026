@@ -7,6 +7,14 @@ from src.stretcher import Stretcher
 from src.level_system import LevelSystem
 
 pygame.init()
+pygame.mixer.init()
+
+pygame.mixer.music.load("assets/music/Jungle and Rainforest Sound Effects - Tropical Forest Ambiences from Costa Rica.mp3")
+pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.play(-1)
+
+
+
 
 W, H = 1280, 720
 screen = pygame.display.set_mode((W, H))
