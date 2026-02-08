@@ -46,9 +46,9 @@ class Stretcher:
             rect.update(self._resize_left(rect, left_delta, min_w))
         if keys[pygame.K_e]:
             rect.update(self._resize_right(rect, right_delta, min_w))
-        if keys[pygame.K_n]:
+        if keys[pygame.K_z]:
             rect.update(self._resize_top(rect, top_delta, min_h))
-        if keys[pygame.K_m]:
+        if keys[pygame.K_c]:
             rect.update(self._resize_bottom(rect, bottom_delta, min_h))
 
         if rect != before:

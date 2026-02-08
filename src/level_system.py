@@ -41,7 +41,8 @@ class LevelSystem:
         for layer in layers:
             layer_name = layer.get("__identifier")
 
-            if layer.get("__identifier") == "StretchTerrain":
+            # Skip the stretchable "StretchTerrain" layer - it's drawn via world.drawables
+            if layer_name == "StretchTerrain":
                 continue
 
             tile_size = layer["__gridSize"]

@@ -77,7 +77,17 @@ levels = LevelSystem(
 levels.load_level("AutoLayers_advanced_demo")
 build_ldtk_collision(world, levels)
 
-
+# Debug: Check how many solids are in world
+print(f"\n=== DEBUG INFO ===")
+print(f"Total objects in world.solids: {len(world.solids)}")
+print(f"Total objects in world.drawables: {len(world.drawables)}")
+for i, obj in enumerate(world.drawables):
+    obj_type = type(obj).__name__
+    if hasattr(obj, 'rect'):
+        print(f"  Drawable [{i}] {obj_type}: rect={obj.rect}")
+    else:
+        print(f"  Drawable [{i}] {obj_type}: NO RECT")
+print(f"==================\n")
 
 running = True
 while running:
@@ -89,7 +99,12 @@ while running:
 
         # Left click to select a terrain object to stretch
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            stretcher.select_at_point(world.drawables, event.pos)
+            print(f"Click at {event.pos}")
+            result = stretcher.select_at_point(world.drawables, event.pos)
+            if result:
+                print(f"✓ Selected: {type(result).__name__}")
+            else:
+                print(f"✗ Nothing selected")
 
     keys = pygame.key.get_pressed()
 
@@ -131,6 +146,12 @@ while running:
 
     # highlight selection so you know what you're stretching
     stretcher.draw_gizmo(screen)
+    
+    # Hover effect: show which tiles are clickable
+    mouse_pos = pygame.mouse.get_pos()
+    for obj in world.drawables:
+        if hasattr(obj, 'rect') and obj.rect.collidepoint(mouse_pos):
+            pygame.draw.rect(screen, (100, 255, 100), obj.rect, 3)  # green outline on hover
     
     playerA.draw(screen, hp_font)
     playerB.draw(screen, hp_font)

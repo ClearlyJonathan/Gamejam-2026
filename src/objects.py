@@ -29,11 +29,11 @@ class StretchGroup:
         self.min_h = 16
 
         self.base_surface = base_surface.convert_alpha()
-        self._cached_size = (rect.w, rect.h)
+        self._cached_size = (rect.width, rect.height)
         self._scaled = pygame.transform.scale(self.base_surface, self._cached_size)
 
     def draw(self, screen: pygame.Surface):
-        size = (self.rect.w, self.rect.h)
+        size = (self.rect.width, self.rect.height)
         if size != self._cached_size:
             self._cached_size = size
             self._scaled = pygame.transform.scale(self.base_surface, size)

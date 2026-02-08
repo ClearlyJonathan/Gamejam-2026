@@ -78,23 +78,17 @@ def build_ldtk_collision(world, level_system):
 
     for layer in level.get("layerInstances", []):
         name = layer["__identifier"]
+        layer_id = layer.get("layerDefUid")
 
         # -------------------------------
-        # Stretchable terrain (SPECIAL)
+        # Stretchable terrain layer (ID: 112)
         # -------------------------------
-        if name == "StretchTerrain":
-            for group in _build_stretch_groups(level_system, layer):
+        if name == "StretchTerrain":  # Only the "StretchTerrain" layer is stretchable
+            groups = _build_stretch_groups(level_system, layer)
+            print(f"Layer '{name}' (ID: {layer_id}): found {len(groups)} stretchable groups")
+            for group in groups:
                 world.add_drawable(group)   # selectable + stretchable
                 world.add_solid(group)      # one big rect collider
             continue
 
-        # -------------------------------
-        # Normal collision tiles
-        # -------------------------------
-        if name == "Collision":
-            tile_size = layer["__gridSize"]
-            tiles = layer.get("gridTiles") or []
-
-            for tile in tiles:
-                x, y = tile["px"]
-                world.add_solid(Wall(x, y, tile_size, tile_size))
+        # Non-stretchable layers are skipped (they stay in level_system.draw)
