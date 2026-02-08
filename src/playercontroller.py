@@ -10,7 +10,7 @@ W, H = 0, 0 # Width and height
 # Physics tuning - Lowkey copied from a random stack overflow. but we can adjust phyiscs as needed
 GRAVITY = 1800.0          # px/s^2
 MOVE_ACCEL = 3500.0       # px/s^2
-MAX_SPEED = 420.0         # px/s
+MAX_SPEED = 100.0         # px/s
 FRICTION = 12.0           # higher = more “snappy” stop
 JUMP_VEL = 720.0          # px/s upward
 SHOULD_APPLY_GRAVITY = True # This is for debugging, gravity since I'm not sure if we have physics yet
@@ -28,8 +28,8 @@ class Player:
         self.images_right = []
         self.index = 0
         self.counter = 0
-        for num in range(1,5):
-            img_right = pygame.image.load(f"src/sprites/brick{num}.png")
+        for num in range(1,30):
+            img_right = pygame.image.load(f"src/sprites/green_jump{num}.png")
             img_right = pygame.transform.scale(img_right, (40, 60))
             self.images_right.append(img_right)
         self.image = self.images_right[self.index]
@@ -129,7 +129,11 @@ class Player:
             self.vel.x = 0
 
         #handle animation
+<<<<<<< Updated upstream
         walk_cooldown = 10
+=======
+        walk_cooldown = 30
+>>>>>>> Stashed changes
         if self.vel.x > 0 or self.vel.x < 0:
             self.counter += 1
             if self.counter > walk_cooldown:
