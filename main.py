@@ -18,7 +18,7 @@ FPS = 60
 # World + level
 world = World(W, H, gravity=1800.0)
 build_test_level(world)  # fills world.solids with Wall objects :contentReference[oaicite:1]{index=1}
-
+#hei
 # Make sure the same objects are drawable + selectable
 # (only do this if your loader doesn't already add drawables)
 for obj in world.solids:
