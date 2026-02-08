@@ -26,7 +26,7 @@ SHOULD_APPLY_GRAVITY = True # This is for debugging, gravity since I'm not sure 
 class Player:
     def __init__(self, x, y, color, controls):
         self.rect = pygame.Rect(x, y, 40, 60)          # visual
-        self.hitbox = pygame.Rect(x + 4, y + 6, 32, 52) # collision (tweak)
+        self.hitbox = pygame.Rect(x + 4, y + 6, 40, 60) # collision (tweak)
 
         self.color = color
         self.controls = controls

@@ -32,7 +32,7 @@ class Stretcher:
         min_w = getattr(self.target, "min_w", 1)
         min_h = getattr(self.target, "min_h", 1)
 
-        shrink = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]
+        shrink = keys[pygame.K_LSHIFT] and keys[pygame.K_RSHIFT]
 
         left_delta   = +self.speed if shrink else -self.speed
         right_delta  = -self.speed if shrink else +self.speed
@@ -48,11 +48,11 @@ class Stretcher:
             new_r = self._resize_right(rect, right_delta, min_w)
             rect.update(new_r)
 
-        if keys[pygame.K_z]:
+        if keys[pygame.K_n]:
             new_r = self._resize_top(rect, top_delta, min_h)
             rect.update(new_r)
 
-        if keys[pygame.K_c]:
+        if keys[pygame.K_m]:
             new_r = self._resize_bottom(rect, bottom_delta, min_h)
             rect.update(new_r)
 
