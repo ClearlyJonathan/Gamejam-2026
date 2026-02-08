@@ -42,6 +42,8 @@ class Player:
         self.pos = pygame.Vector2(self.hitbox.topleft) # track hitbox pos using dillu hitbox system
         self.vel = pygame.Vector2(0, 0)
         self.on_ground = False
+        self.hp = 100
+        self.max_hp = 100
 
     def handle_input(self, keys, dt):
         ax = 0.0
@@ -143,8 +145,40 @@ class Player:
 
         self.rect.midbottom = self.hitbox.midbottom
 
-    def draw(self, surf):
+    def draw(self, surf, font):
         surf.blit(self.image, self.rect)
+
+         # draw hp above head
+        # ---- HP BAR ----
+        bar_width = self.rect.width
+        bar_height = 6
+        padding = 8
+
+        # position above head
+        x = self.rect.left
+        y = self.rect.top - padding - bar_height
+
+        # background (missing hp)
+        bg_rect = pygame.Rect(x, y, bar_width, bar_height)
+        pygame.draw.rect(surf, (80, 80, 80), bg_rect)
+
+        # current hp
+        hp_ratio = self.hp / self.max_hp
+        hp_rect = pygame.Rect(x, y, int(bar_width * hp_ratio), bar_height)
+
+        # color changes with hp
+        if hp_ratio > 0.6:
+            color = (0, 220, 0)
+        elif hp_ratio > 0.3:
+            color = (240, 200, 0)
+        else:
+            color = (220, 40, 40)
+
+        pygame.draw.rect(surf, color, hp_rect)
+
+    def take_damage(self, amount: int):
+        self.hp = max(0, self.hp - amount)
+
 
 playerA = Player(
     x=200, y=500, color=(200, 60, 60),
