@@ -45,11 +45,6 @@ playerB = pc.playerB
 stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
-<<<<<<< Updated upstream
-levels = LevelSystem(
-    "ldtk.json",
-    "assets/tilesetResizeResize.png")
-=======
 levels = LevelSystem("assets/tilesetResizeResize.png")
 
 level_list = [
@@ -63,7 +58,6 @@ levels.load_level(level_list[current_level_index])
 
 events = LevelEvents()
 events.build(levels.current_level)
->>>>>>> Stashed changes
 
 build_ldtk_collision(world, levels)
 

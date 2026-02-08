@@ -18,10 +18,6 @@ def build_ldtk_collision(world, level_system):
         # stretch flag
         stretchable = name == "StretchTerrain"
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
         tile_size = layer["__gridSize"]
 
         tiles = (
