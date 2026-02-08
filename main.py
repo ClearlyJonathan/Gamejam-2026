@@ -68,7 +68,7 @@ stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "map2.json",
+    "src/map2.json",
     "assets/tilesetResizeResize.png")
 
 #Laster fÃ¸rste level
