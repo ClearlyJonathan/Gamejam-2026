@@ -63,6 +63,7 @@ pc.GRAVITY = 1800
 pc.SHOULD_APPLY_GRAVITY = False
 playerA = pc.playerA
 playerB = pc.playerB
+#pc.SHOULD_APPLY_GRAVITY = False
 
 # Stretch tool
 stretcher = Stretcher(speed=6)
@@ -122,13 +123,14 @@ while running:
     # Draw
     screen.fill((20, 22, 28))
 
+    levels.draw(screen)
+
     for obj in world.drawables:
         # draw terrain blocks
         obj.draw(screen)
 
     # highlight selection so you know what you're stretching
     stretcher.draw_gizmo(screen)
-    levels.draw(screen)
 
     playerA.draw(screen, hp_font)
     playerB.draw(screen, hp_font)
