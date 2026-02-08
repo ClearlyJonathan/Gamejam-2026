@@ -264,6 +264,8 @@ class Player1:
         # Apply horizontal acceleration
         self.vel.x += ax * dt
 
+        
+
         # Clamp horizontal speed
         if self.vel.x > MAX_SPEED: self.vel.x = MAX_SPEED
         if self.vel.x < -MAX_SPEED: self.vel.x = -MAX_SPEED
@@ -272,6 +274,16 @@ class Player1:
         if jump and self.on_ground:
             self.vel.y = -JUMP_VEL
             self.on_ground = False
+
+            if jump and self.on_ground:
+                self.vel.y = -JUMP_VEL
+                self.on_ground = False
+
+            if self is playerB:
+                sound.jump_a.play()
+            else:
+                sound.jump_b.play()
+
 
     def apply_friction(self, dt):
         self.vel.x -= self.vel.x * min(1.0, FRICTION * dt)
@@ -389,7 +401,15 @@ class Player1:
 
     def take_damage(self, amount: int):
         self.hp = max(0, self.hp - amount)
-
+        if self is playerA:
+            sound.hit_a.play()
+        else:
+            sound.hit_b.play()
+        if self.hp == 0:
+            if self is playerB:
+                sound.death_a.play()
+            else:
+                sound.death_b.play()        
 playerA = Player1(
     x=200, y=500, color=(200, 60, 60),
     controls={"left": pygame.K_a, "right": pygame.K_d, "jump": pygame.K_w},
