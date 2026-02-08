@@ -1,3 +1,4 @@
+
 import pygame
 
 
@@ -20,18 +21,22 @@ SHOULD_APPLY_GRAVITY = True # This is for debugging, gravity since I'm not sure 
     solids = walls + crates + platforms   # things that block movement
     triggers = coins + checkpoints        # things that overlap (not added yet)
     enemies = enemy_list                  # special handling
+    """
 
-"""
+
 
 class Player:
     def __init__(self, x, y, color, controls):
         self.images_right = []
+        self.images_left = []
         self.index = 0
         self.counter = 0
         for num in range(1,5):
             img_right = pygame.image.load(f"src/sprites/brick{num}.png")
-            img_right = pygame.transform.scale(img_right, (40, 60))
+            img_right = pygame.transform.scale(img_right, (64, 64))
+            img_left = pygame.transform.flip(img_right, True, False)
             self.images_right.append(img_right)
+            self.images_left.append(img_left)
         self.image = self.images_right[self.index]
         self.rect = pygame.Rect(x, y, 40, 60)         # visual
         self.hitbox = pygame.Rect(x + 4, y + 6, 40, 60) # collision (tweak)
@@ -42,6 +47,8 @@ class Player:
         self.pos = pygame.Vector2(self.hitbox.topleft) # track hitbox pos using dillu hitbox system
         self.vel = pygame.Vector2(0, 0)
         self.on_ground = False
+
+        self.direction = 0
 
     def handle_input(self, keys, dt):
         ax = 0.0
@@ -128,14 +135,20 @@ class Player:
 
         #handle animation
         walk_cooldown = 10
+        if self.vel.x < 0:
+            self.direction = -1
         if self.vel.x > 0:
             self.counter += 1
-            if self.counter > walk_cooldown:
-                self.counter = 0
-                self.index += 1
-                if self.index >= len(self.images_right):
-                    self.index = 0
-                self.image = self.images_right[self.index]
+            self.direction = 1
+        if self.counter > walk_cooldown:
+            self.counter = 0
+            self.index += 1
+            if self.index >= len(self.images_right):
+                self.index = 0
+            if self.direction == 1:                    self.image = self.images_right[self.index]
+            if self.direction == -1:
+                self.image = self.images_left[self.index]
+            self.image = self.images_right[self.index]
         if self.vel.x == 0 and self.vel.y == 0:
             self.counter = 0
             self.index = 0
@@ -155,6 +168,4 @@ playerB = Player(
     x=900, y=500, color=(60, 120, 220),
     controls={"left": pygame.K_LEFT, "right": pygame.K_RIGHT, "jump": pygame.K_UP},
 )
-
-
 

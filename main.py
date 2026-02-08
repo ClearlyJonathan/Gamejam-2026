@@ -4,7 +4,12 @@ import src.playercontroller as pc
 from src.world import World
 from src.level_loader import build_test_level
 from src.stretcher import Stretcher
+<<<<<<< Updated upstream
 from src.level_system import LevelSystem
+=======
+from src.level_system import LevelSystem    
+from src.menu import run_menu
+>>>>>>> Stashed changes
 
 pygame.init()
 
