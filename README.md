@@ -14,6 +14,8 @@ Gruppemedlemmer:
 - Adam
 - Dilhumar
 - Esma
+- Mila
+- Issam
 
 ## Controls
 
