@@ -130,7 +130,7 @@ class Player:
 
         #handle animation
         walk_cooldown = 10
-        if self.vel.x > 0:
+        if self.vel.x > 0 or self.vel.x < 0:
             self.counter += 1
             if self.counter > walk_cooldown:
                 self.counter = 0
