@@ -1,4 +1,5 @@
 import pygame
+from level_system import LevelSystem
 import src.playercontroller
 
 
@@ -22,6 +23,12 @@ playerA = src.playercontroller.playerA
 playerB = src.playercontroller.playerB
 
 
+#Starte/Loade levelsene:
+levels = LevelSystem(
+    "project.ldtk",
+    "assets/tileset.png")
+
+levels.load_level("Level_0")
 
 running = True
 while running:
@@ -50,6 +57,8 @@ while running:
 
     # --- Draw ---
     screen.fill((20, 22, 28))
+
+    levels.draw(screen)
 
     # ground
     pygame.draw.rect(screen, (60, 65, 75), (0, GROUND_Y, W, H - GROUND_Y))
