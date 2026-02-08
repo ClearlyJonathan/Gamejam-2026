@@ -24,7 +24,12 @@ for obj in world.solids:
     if obj not in world.drawables:
         world.add_drawable(obj)
 
+GROUND_Y = 600
 # Two players (from your existing file)
+pc.W = W
+pc.H = H
+pc.GROUND_Y = GROUND_Y
+pc.GRAVITY = 1800
 playerA = pc.playerA
 playerB = pc.playerB
 
