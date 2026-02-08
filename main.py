@@ -1,5 +1,9 @@
 import pygame
 import src.playercontroller as pc
+import src.world as wd
+import src.level_loader as level
+
+
 
 
 # pygame setup do not touch - Just temporarily so i can see my playerr
@@ -12,15 +16,19 @@ running = True
 dt = 0
 FPS = 60
 GROUND_Y = 600
-
+world = wd.World(W,H, 1800.0)
+# Example of how to add a collidable
+ground = pygame.Rect(0, GROUND_Y, W, H - GROUND_Y)
+world.add_solid(ground)
+level.build_test_level(world)
 # Don't touch player controller, just modify from here if needed.
+
 pc.W = W
 pc.H = H
 pc.GROUND_Y = GROUND_Y
 pc.GRAVITY = 1800
 playerA = pc.playerA
 playerB = pc.playerB
-
 
 
 running = True
@@ -45,11 +53,14 @@ while running:
         playerB.apply_friction(dt)
 
     # --- Update physics ---
-    playerA.update(dt)
-    playerB.update(dt)
+    playerA.update(dt, world)
+    playerB.update(dt, world)
 
     # --- Draw ---
     screen.fill((20, 22, 28))
+    for solid in world.solids:
+        if hasattr(solid, "draw"):
+            solid.draw(screen)
 
     # ground
     pygame.draw.rect(screen, (60, 65, 75), (0, GROUND_Y, W, H - GROUND_Y))
@@ -60,3 +71,5 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
+
+

@@ -1,0 +1,146 @@
+import sys
+import pygame
+
+pygame.init()
+
+SCREEN_W, SCREEN_H = 900, 600
+screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
+pygame.display.set_caption("yurr")
+clock = pygame.time.Clock()
+
+PNG_PATH = "brick.png"
+BORDER = 16
+SPEED = 5
+
+panel = pygame.Rect(250, 160, 260, 180)
+MIN_W = BORDER * 2 + 1
+MIN_H = BORDER * 2 + 1
+
+img = pygame.image.load(PNG_PATH).convert_alpha()
+iw, ih = img.get_size()
+if iw < BORDER * 2 or ih < BORDER * 2:
+    raise ValueError("BORDER is too large for the image.")
+
+def slice_9(image: pygame.Surface, b: int):
+    w, h = image.get_size()
+    return {
+        #(x,y,width,height)
+        "tl": image.subsurface((0, 0, b, b)),
+        "tr": image.subsurface((w - b, 0, b, b)),
+        "bl": image.subsurface((0, h - b, b, b)),
+        "br": image.subsurface((w - b, h - b, b, b)),
+        "top": image.subsurface((b, 0, w - 2*b, b)),
+        "bottom": image.subsurface((b, h - b, w - 2*b, b)),
+        "left": image.subsurface((0, b, b, h - 2*b)),
+        "right": image.subsurface((w - b, b, b, h - 2*b)),
+        "center": image.subsurface((b, b, w - 2*b, h - 2*b)),
+    }
+
+slices = slice_9(img, BORDER)
+
+def blit_tile(dst: pygame.Surface, tile: pygame.Surface, dst_rect: pygame.Rect):
+    x0, y0, w, h = dst_rect
+    if w <= 0 or h <= 0:
+        return
+    tw, th = tile.get_size()
+    if tw <= 0 or th <= 0:
+        return
+
+    y = y0
+    while y < y0 + h:
+        x = x0
+        blit_h = min(th, (y0 + h) - y)
+        while x < x0 + w:
+            blit_w = min(tw, (x0 + w) - x)
+            if blit_w != tw or blit_h != th:
+                dst.blit(tile, (x, y), area=pygame.Rect(0, 0, blit_w, blit_h))
+            else:
+                dst.blit(tile, (x, y))
+            x += tw
+        y += th
+
+def draw_9slice_tiled(dst: pygame.Surface, rect: pygame.Rect, s: dict, b: int):
+    x, y, w, h = rect
+    w = max(w, b * 2 + 1)
+    h = max(h, b * 2 + 1)
+
+    # corners
+    dst.blit(s["tl"], (x, y))
+    dst.blit(s["tr"], (x + w - b, y))
+    dst.blit(s["bl"], (x, y + h - b))
+    dst.blit(s["br"], (x + w - b, y + h - b))
+
+    # edges + center tiled
+    blit_tile(dst, s["top"],    pygame.Rect(x + b, y,         w - 2*b, b))
+    blit_tile(dst, s["bottom"], pygame.Rect(x + b, y + h - b, w - 2*b, b))
+    blit_tile(dst, s["left"],   pygame.Rect(x,     y + b,     b,       h - 2*b))
+    blit_tile(dst, s["right"],  pygame.Rect(x + w - b, y + b, b,       h - 2*b))
+    blit_tile(dst, s["center"], pygame.Rect(x + b, y + b,     w - 2*b, h - 2*b))
+
+def resize_left(r: pygame.Rect, delta: int, min_w: int):
+    """Move left edge by delta. delta<0 grows left, delta>0 shrinks."""
+    out = r.copy()
+    new_x = out.x + delta
+    new_w = out.width - delta  # subtract because moving left edge changes width oppositely
+    if new_w < min_w:
+        right = out.right
+        new_w = min_w
+        new_x = right - new_w
+    out.x, out.width = new_x, new_w
+    return out
+
+def resize_right(r: pygame.Rect, delta: int, min_w: int) -> pygame.Rect:
+    """Move right edge by delta. delta>0 grows, delta<0 shrinks."""
+    out = r.copy()
+    out.width = max(min_w, out.width + delta)
+    return out
+
+def resize_top(r: pygame.Rect, delta: int, min_h: int) -> pygame.Rect:
+
+    out = r.copy()
+    new_y = out.y + delta
+    new_h = out.height - delta
+    if new_h < min_h:
+        bottom = out.bottom
+        new_h = min_h
+        new_y = bottom - new_h
+    out.y, out.height = new_y, new_h
+    return out
+
+def resize_bottom(r: pygame.Rect, delta: int, min_h: int) -> pygame.Rect:
+    """Move bottom edge by delta. delta>0 grows, delta<0 shrinks."""
+    out = r.copy()
+    out.height = max(min_h, out.height + delta)
+    return out
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    keys = pygame.key.get_pressed()
+    shrink = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]
+
+    # Pick deltas based on shrink vs grow (THIS is the key fix)
+    left_delta   = +SPEED if shrink else -SPEED
+    right_delta  = -SPEED if shrink else +SPEED
+    top_delta    = +SPEED if shrink else -SPEED
+    bottom_delta = -SPEED if shrink else +SPEED
+
+    if keys[pygame.K_q]:
+        panel = resize_left(panel, left_delta, MIN_W)
+    if keys[pygame.K_e]:
+        panel = resize_right(panel, right_delta, MIN_W)
+    if keys[pygame.K_z]:
+        panel = resize_top(panel, top_delta, MIN_H)
+    if keys[pygame.K_c]:
+        panel = resize_bottom(panel, bottom_delta, MIN_H)
+
+    screen.fill((25, 25, 25))
+    draw_9slice_tiled(screen, panel, slices, BORDER)
+    pygame.draw.rect(screen, (255, 255, 255), panel, 1)
+
+    pygame.display.flip()
+    clock.tick(240)
+
