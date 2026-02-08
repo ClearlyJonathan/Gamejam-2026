@@ -1,42 +1,39 @@
 from src.objects import Wall
 
+
 def build_ldtk_collision(world, level_system):
+
     level = level_system.current_level
     if not level:
         return
-    
-    #henter tilesize definert i levelsystem
-    tile_size = level_system.tile_size
 
-    for layer in level.get("layerInstances",[]):
-        
+    for layer in level.get("layerInstances", []):
+
         name = layer["__identifier"]
-        size = layer["__gridSize"]
 
-
-        #Stretchable tiles
-        if name == "StretchTerrain":
-            strechable = True
-
-        #Vanlige tiles
-        elif name == "Collision":
-            stretchable = False
-
-        else:
+        # velg hvilke layers som skal gi collision
+        if name not in ("Collision", "StretchTerrain"):
             continue
 
-        tiles = (layer.get("gritTiles") or layer.get("autoLayerTiles") or [])
+        # stretch flag
+        stretchable = name == "StretchTerrain"
+
+        tile_size = layer["__gridSize"]
+
+        tiles = (
+            layer.get("gridTiles")
+            or layer.get("autoLayerTiles")
+            or []
+        )
 
         for tile in tiles:
-            
-            x,y = tile["px"]
+
+            x, y = tile["px"]
 
             wall = Wall(x, y, tile_size, tile_size)
 
             world.add_solid(wall)
 
+            # stretchable terrain må være drawable
             if stretchable:
                 world.add_drawable(wall)
-
-
-    
