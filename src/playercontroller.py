@@ -129,19 +129,7 @@ class Player:
             self.vel.x = 0
 
         #handle animation
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         walk_cooldown = 10
-=======
-        walk_cooldown = 30
->>>>>>> Stashed changes
-=======
-        walk_cooldown = 30
->>>>>>> Stashed changes
-=======
-        walk_cooldown = 30
->>>>>>> Stashed changes
         if self.vel.x > 0 or self.vel.x < 0:
             self.counter += 1
             if self.counter > walk_cooldown:
