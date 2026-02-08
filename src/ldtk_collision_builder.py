@@ -5,23 +5,21 @@ def build_ldtk_collision(world, level_system):
 
     level = level_system.current_level
     if not level:
-        return
+        return []
+
+    spawn_positions = []
 
     for layer in level.get("layerInstances", []):
 
         name = layer["__identifier"]
 
         # velg hvilke layers som skal gi collision
-        if name not in ("Collision", "StretchTerrain", "Door", "Killer"):
+        # include Spawn so we can collect spawn positions
+        if name not in ("Collision", "StretchTerrain", "Door", "Killer", "Spawn"):
             continue
 
         # stretch flag
         stretchable = name == "StretchTerrain"
-
-        door = name == "Door"
-
-        killer = name == "Killer"
-        
 
         tile_size = layer["__gridSize"]
 
@@ -31,14 +29,22 @@ def build_ldtk_collision(world, level_system):
             or []
         )
 
-        for tile in tiles:
+        # Spawn layer: collect player spawn positions
+        if name == "Spawn":
+            for tile in tiles:
+                x, y = tile["px"]
+                spawn_positions.append((x, y))
+            # nothing to add to solids/drawables for spawn
+            continue
 
+        for tile in tiles:
             x, y = tile["px"]
 
             wall = Wall(x, y, tile_size, tile_size)
 
             world.add_solid(wall)
 
-            # stretchable terrain må være drawable
+            # stretchable terrain must be drawable/selectable
             if stretchable:
                 world.add_drawable(wall)
+    return spawn_positions

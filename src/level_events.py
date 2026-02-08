@@ -23,23 +23,38 @@ class LevelEvents:
                 elif name == "Killer":
                     self.killers.append(rect)
 
-    def check(self, players):
-        # Sett for å lagre hvilke dører som har spillere på seg
-        doors_with_players = set()
-
-        for p in players:
-            player_rect = p.hitbox
-
-            # Sjekk killers først
-            for k in self.killers:
-                if player_rect.colliderect(k):
-                    p.hp = 0
-
-            # Sjekk dører
+        # Debug: list door rects
+        if self.doors:
+            print("[LevelEvents] Built doors:")
             for i, d in enumerate(self.doors):
-                if player_rect.colliderect(d):
-                    doors_with_players.add(i)
+                print(f"  door[{i}] = {d}")
 
-        # Bytt nivå hvis alle spillere står på unike dører
-        next_level = len(doors_with_players) >= len(players)
-        return next_level
+    def check(self, players):
+        # First, check killers
+        for idx, p in enumerate(players):
+            player_rect = p.hitbox
+            for k in self.killers:
+                # be slightly forgiving with killer overlap
+                if player_rect.colliderect(k.inflate(4, 4)):
+                    p.hp = 0
+                    print(f"[LevelEvents] Player {idx} touched killer -> hp=0")
+                    break
+
+        # Require every player to be overlapping a door (they may share the same door)
+        # Debug: report door counts and each player's overlap
+        # (print statements help us see why triggers don't fire)
+        print(f"[LevelEvents] doors={len(self.doors)}, killers={len(self.killers)}")
+        players_on = []
+        # inflate doors slightly for more forgiving overlap detection
+        inflate_px = 8
+        for i, p in enumerate(players):
+            player_rect = p.hitbox
+            on_any = any(player_rect.colliderect(d.inflate(inflate_px, inflate_px)) for d in self.doors)
+            players_on.append(on_any)
+            print(f"[LevelEvents] Player {i} on_door={on_any} rect={player_rect}")
+
+        all_on = all(players_on) and len(players) > 0
+        if all_on:
+            print("[LevelEvents] All players on door -> next level")
+        return all_on
+

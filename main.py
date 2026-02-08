@@ -31,7 +31,7 @@ pygame.mixer.music.play(-1)
 W, H = 1280, 720
 screen = pygame.display.set_mode((W, H))
 clock = pygame.time.Clock()
-pygame.display.set_caption("Suck and blow")
+pygame.display.set_caption("Grow And Degrow")
 FPS = 60
 
 # Menu
@@ -39,6 +39,8 @@ choice = run_menu(screen, clock, "Suck and Blow")
 if choice == "quit":
     pygame.quit()
     raise SystemExit
+
+run_transition(screen, clock, image_path="assets/StartLevelScreen.png", duration=2.0)
 
 pygame.mixer.music.fadeout(1)
 pygame.mixer.music.load(GAME_MUSIC)
@@ -109,9 +111,9 @@ while running:
     if not (keys[playerA.controls["left"]] or keys[playerA.controls["right"]]):
         playerA.apply_friction(dt)
 
-    playerB.handle_input(keys, dt)
-    if not (keys[playerB.controls["left"]] or keys[playerB.controls["right"]]):
-        playerB.apply_friction(dt)
+        # Physics + collision vs world.solids (this is the important part)
+        playerA.update(dt, world)  # needs update(dt, world) :contentReference[oaicite:2]{index=2}
+        playerB.update(dt, world)
 
     # Physics + collision vs solids
     playerA.update(dt, world)
@@ -127,11 +129,11 @@ while running:
     next_level = events.check([playerA, playerB])
 
     if next_level:
-        if not run_transition(screen, clock):
+        if not run_transition(screen, clock, image_path="assets/NextLevelScreen.png", duration=2.0):
             running = False
-            break
 
-        levels.next_level()
+            # advance to next level once
+            levels.next_level()
 
         # clear old world
         world.solids.clear()
@@ -139,8 +141,8 @@ while running:
         world.triggers.clear()
         world.entities.clear()
 
-        events.build(levels.current_level)
-        build_ldtk_collision(world, levels)
+            events.build(levels.current_level)
+            spawn_positions = build_ldtk_collision(world, levels)
 
         # rebuild killer zones for new level
         killer.rebuild_from_level(levels)
@@ -154,15 +156,26 @@ while running:
         playerB.hitbox.topleft = (200, 200)
         playerB.vel.xy = (0, 0)
 
-        print("Loaded level:", levels.current_level.get("identifier"))
-        print("Solids:", len(world.solids))
-        print("Layers:", len(levels.current_level.get("layerInstances", [])))
+                playerA.pos.x, playerA.pos.y = ax, ay
+                playerA.hitbox.topleft = (ax, ay)
+                playerA.rect.topleft = playerA.hitbox.topleft
+                playerA.vel = pygame.Vector2(0, 0)
+                playerA.on_ground = False
+                playerA.hp = playerA.max_hp
 
     # Draw
     screen.fill((20, 22, 28))
 
     for obj in world.drawables:
         obj.draw(screen)
+        # highlight stretchable objects with a subtle grey outline
+        if hasattr(obj, "min_w") or hasattr(obj, "min_h"):
+            pygame.draw.rect(screen, (120, 120, 120), obj.rect, 2)
+
+    # draw door debug outlines (from LevelEvents)
+    if hasattr(events, 'doors'):
+        for d in events.doors:
+            pygame.draw.rect(screen, (0, 180, 255), d, 3)
 
     levels.draw(screen)
     stretcher.draw_gizmo(screen)
