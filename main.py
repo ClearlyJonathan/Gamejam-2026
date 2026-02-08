@@ -43,10 +43,10 @@ stretcher = Stretcher(speed=6)
 #Starte/Loade levelsene:
 levels = LevelSystem(
     "ldtk.json",
-    "assets/tilesetResize.png")
+    "assets/tilesetResizeResize.png")
 
 #Laster fÃ¸rste level
-levels.load_level("Level_0")
+levels.load_level("AutoLayers_advanced_demo")
 build_ldtk_collision(world, levels)
 
 

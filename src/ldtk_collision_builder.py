@@ -11,9 +11,11 @@ def build_ldtk_collision(world, level_system):
     for layer in level.get("layerInstances",[]):
         
         name = layer["__identifier"]
+        size = layer["__gridSize"]
+
 
         #Stretchable tiles
-        if name == "StrechTerrain":
+        if name == "StretchTerrain":
             strechable = True
 
         #Vanlige tiles
