@@ -35,7 +35,7 @@ pygame.mixer.music.play(-1)
 W, H = 1280, 720
 screen = pygame.display.set_mode((W, H))
 clock = pygame.time.Clock()
-pygame.display.set_caption("Suck and blow")
+pygame.display.set_caption("Grow And Degrow")
 FPS = 60
 
 # load gameover image (scaled to window) if available
@@ -47,7 +47,7 @@ except Exception:
 
 
 #Menu
-choice = run_menu(screen, clock, "Suck and Blow")
+choice = run_menu(screen, clock, "Grow And Degrow")
 if choice == "quit":
     pygame.quit()
     raise SystemExit
@@ -83,7 +83,7 @@ stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "assets/ADAM.ldtk",
+    "assets/ADAM.json",
     "assets/tilesetResizeResize.png"
 )
 
