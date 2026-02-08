@@ -19,16 +19,22 @@ Gruppemedlemmer:
 
 #### Player A
 - **← / →** – Bevegelse venstre / høyre  
-- **↑** – Hopp  
+- **↑** – Hopp
+- **M** – Strekk terreng ned  
+- **N** – Strekk terreng opp  
 
 #### Player B
 - **A / D** – Bevegelse venstre / høyre  
-- **W** – Hopp  
+- **W** – Hopp
+- **Q** – Strekk terreng venstre  
+- **E** – Strekk terreng høyre    
 
-
-### Stretch Tool
-- **Q / E / M / N (+ Shift)** – Strekke / krympe terreng  
-- **Venstreklikk** – Velg objekt  
+### Shrink (krympe terreng)
+- For å krympe må **begge spillerne trykke Shift samtidig**  
+- Velg retning med **M / N / Q / E** for å krympe terrenget i ønsket retning
+- Eksempel:  
+  - Shift + M → krymper terreng ned  
+  - Shift + E → krymper terreng mot høyre 
 
 ---
 
