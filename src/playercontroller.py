@@ -10,7 +10,7 @@ W, H = 0, 0 # Width and height
 # Physics tuning - Lowkey copied from a random stack overflow. but we can adjust phyiscs as needed
 GRAVITY = 1800.0          # px/s^2
 MOVE_ACCEL = 3500.0       # px/s^2
-MAX_SPEED = 100.0         # px/s
+MAX_SPEED = 300.0         # px/s
 FRICTION = 12.0           # higher = more “snappy” stop
 JUMP_VEL = 720.0          # px/s upward
 SHOULD_APPLY_GRAVITY = True # This is for debugging, gravity since I'm not sure if we have physics yet
