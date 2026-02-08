@@ -26,35 +26,35 @@ class Stretcher:
 
     def update(self, keys):
         if not self.target:
-            return
+            return None
 
         rect = self.target.rect
         min_w = getattr(self.target, "min_w", 1)
         min_h = getattr(self.target, "min_h", 1)
 
-        shrink = keys[pygame.K_LSHIFT] and keys[pygame.K_RSHIFT]
+        # either shift key = shrink mode
+        shrink = keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]
+
+        before = rect.copy()
 
         left_delta   = +self.speed if shrink else -self.speed
         right_delta  = -self.speed if shrink else +self.speed
         top_delta    = +self.speed if shrink else -self.speed
         bottom_delta = -self.speed if shrink else +self.speed
 
-        # mutate the SAME rect object (important for collision references)
         if keys[pygame.K_q]:
-            new_r = self._resize_left(rect, left_delta, min_w)
-            rect.update(new_r)
-
+            rect.update(self._resize_left(rect, left_delta, min_w))
         if keys[pygame.K_e]:
-            new_r = self._resize_right(rect, right_delta, min_w)
-            rect.update(new_r)
-
+            rect.update(self._resize_right(rect, right_delta, min_w))
         if keys[pygame.K_n]:
-            new_r = self._resize_top(rect, top_delta, min_h)
-            rect.update(new_r)
-
+            rect.update(self._resize_top(rect, top_delta, min_h))
         if keys[pygame.K_m]:
-            new_r = self._resize_bottom(rect, bottom_delta, min_h)
-            rect.update(new_r)
+            rect.update(self._resize_bottom(rect, bottom_delta, min_h))
+
+        if rect != before:
+            return "shrink" if shrink else "stretch"
+        return None
+
 
     def draw_gizmo(self, screen):
         if self.target:

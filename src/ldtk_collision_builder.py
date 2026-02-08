@@ -12,11 +12,16 @@ def build_ldtk_collision(world, level_system):
         name = layer["__identifier"]
 
         # velg hvilke layers som skal gi collision
-        if name not in ("Collision", "StretchTerrain"):
+        if name not in ("Collision", "StretchTerrain", "Door", "Killer"):
             continue
 
         # stretch flag
         stretchable = name == "StretchTerrain"
+
+        door = name == "Door"
+
+        killer = name == "Killer"
+        
 
         tile_size = layer["__gridSize"]
 
