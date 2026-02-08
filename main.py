@@ -8,6 +8,9 @@ from src.level_system import LevelSystem
 
 from src.ldtk_collision_builder import build_ldtk_collision
 
+from src.level_events import LevelEvents
+from src.level_transition import run_transition
+
 
 pygame.init()
 
@@ -42,15 +45,29 @@ playerB = pc.playerB
 stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
+<<<<<<< Updated upstream
 levels = LevelSystem(
     "ldtk.json",
     "assets/tilesetResizeResize.png")
+=======
+levels = LevelSystem("assets/tilesetResizeResize.png")
 
-#Laster fÃ¸rste level
-levels.load_level("AutoLayers_advanced_demo")
+level_list = [
+    "src/levels/map2.json",
+    "src/levels/map2.json",
+]
+
+current_level_index = 0
+
+levels.load_level(level_list[current_level_index])
+
+events = LevelEvents()
+events.build(levels.current_level)
+>>>>>>> Stashed changes
+
 build_ldtk_collision(world, levels)
 
-
+print(levels.current_level.keys())
 
 running = True
 while running:
@@ -81,6 +98,34 @@ while running:
     # Physics + collision vs world.solids (this is the important part)
     playerA.update(dt, world)  # needs update(dt, world) :contentReference[oaicite:2]{index=2}
     playerB.update(dt, world)
+
+    next_level = events.check([playerA, playerB])
+
+    if next_level:
+
+        if not run_transition(screen, clock):
+            running = False
+
+        current_level_index += 1
+
+        if current_level_index >= len(level_list):
+            current_level_index = 0
+
+        world.solids.clear()
+        world.drawables.clear()
+
+        levels.load_level(level_list[current_level_index])
+
+        events.build(levels.current_level)
+        build_ldtk_collision(world, levels)
+                
+                
+        playerA.pos.xy = (200, 200)
+        playerA.hitbox.topleft = (200, 200)
+
+        playerB.pos.xy = (400, 200)
+        playerB.hitbox.topleft = (400, 200)
+
 
     # Draw
     screen.fill((20, 22, 28))
