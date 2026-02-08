@@ -25,7 +25,15 @@ SHOULD_APPLY_GRAVITY = True # This is for debugging, gravity since I'm not sure 
 
 class Player:
     def __init__(self, x, y, color, controls):
-        self.rect = pygame.Rect(x, y, 40, 60)          # visual
+        self.images_right = []
+        self.index = 0
+        self.counter = 0
+        for num in range(1,5):
+            img_right = pygame.image.load(f"src/sprites/brick{num}.png")
+            img_right = pygame.transform.scale(img_right, (40, 60))
+            self.images_right.append(img_right)
+        self.image = self.images_right[self.index]
+        self.rect = pygame.Rect(x, y, 40, 60)         # visual
         self.hitbox = pygame.Rect(x + 4, y + 6, 40, 60) # collision (tweak)
 
         self.color = color
@@ -118,10 +126,25 @@ class Player:
             self.pos.x = self.hitbox.x
             self.vel.x = 0
 
+        #handle animation
+        walk_cooldown = 10
+        if self.vel.x > 0:
+            self.counter += 1
+            if self.counter > walk_cooldown:
+                self.counter = 0
+                self.index += 1
+                if self.index >= len(self.images_right):
+                    self.index = 0
+                self.image = self.images_right[self.index]
+        if self.vel.x == 0 and self.vel.y == 0:
+            self.counter = 0
+            self.index = 0
+            self.image = self.images_right[self.index]
+
         self.rect.midbottom = self.hitbox.midbottom
 
     def draw(self, surf):
-        pygame.draw.rect(surf, self.color, self.rect)
+        surf.blit(self.image, self.rect)
 
 playerA = Player(
     x=200, y=500, color=(200, 60, 60),
