@@ -5,6 +5,8 @@ import src.world as wd
 import src.level_loader as level
 
 
+from level_system import LevelSystem
+import src.playercontroller
 
 
 # pygame setup do not touch - Just temporarily so i can see my playerr
@@ -36,6 +38,14 @@ playerB = pc.playerB
 # Test
 panel_skin = NineSlice("assets/brick.png", border=16, tile=True)
 panel_rect = pygame.Rect(250, 160, 260, 180)
+
+#Starte/Loade levelsene:
+levels = LevelSystem(
+    "ldtk.json",
+    "assets/tilesetResize.png")
+
+#Laster første level
+levels.load_level("Level_0")
 
 running = True
 while running:
@@ -69,6 +79,9 @@ while running:
             solid.draw(screen)
     
     panel_skin.draw(screen, panel_rect)
+
+    #Renderer levelet
+    levels.draw(screen)
 
     # ground
     pygame.draw.rect(screen, (60, 65, 75), (0, GROUND_Y, W, H - GROUND_Y))
