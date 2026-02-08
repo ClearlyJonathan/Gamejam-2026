@@ -18,16 +18,31 @@ GROUND_Y = 600
 src.playercontroller.W = W
 src.playercontroller.H = H
 src.playercontroller.GROUND_Y = GROUND_Y
-src.playercontroller.GRAVITY = True
-playerA = src.playercontroller.playerA
-playerB = src.playercontroller.playerB
+src.playercontroller.GRAVITY = 1800
+#playerA = src.playercontroller.playerA
+#playerB = src.playercontroller.playerB
 
+
+
+#midlertidig for playtesting
+playerA = src.playercontroller.Player(
+    100, 100,
+    (200, 40, 40),
+    {"left": pygame.K_a, "right": pygame.K_d, "jump": pygame.K_w}
+)
+#midlertidig for playtesting
+playerB = src.playercontroller.Player(
+    300, 100,
+    (40, 40, 200),
+    {"left": pygame.K_LEFT, "right": pygame.K_RIGHT, "jump": pygame.K_UP}
+)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "project.ldtk",
-    "assets/tileset.png")
+    "ldtk.json",
+    "assets/tilesetResize.png")
 
+#Laster første level
 levels.load_level("Level_0")
 
 running = True
@@ -58,6 +73,7 @@ while running:
     # --- Draw ---
     screen.fill((20, 22, 28))
 
+    #Renderer levelet
     levels.draw(screen)
 
     # ground
