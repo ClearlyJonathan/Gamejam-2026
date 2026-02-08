@@ -52,6 +52,8 @@ if choice == "quit":
     pygame.quit()
     raise SystemExit
 
+run_transition(screen, clock, image_path="assets/StartLevelScreen.png", duration=2.0)
+
 pygame.mixer.music.fadeout(1)
 pygame.mixer.music.load(GAME_MUSIC)
 pygame.mixer.music.set_volume(0.2)
@@ -224,8 +226,9 @@ while running:
 
         if next_level:
 
-            if not run_transition(screen, clock):
-                running = False
+    if next_level:
+        if not run_transition(screen, clock, image_path="assets/NextLevelScreen.png", duration=2.0):
+            running = False
 
             # advance to next level once
             levels.next_level()

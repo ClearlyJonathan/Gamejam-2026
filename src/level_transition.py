@@ -1,15 +1,19 @@
+# level_transition.py
 import pygame
 
-def run_transition(screen, clock):
-    # Last inn bildet du vil vise som "Next Level"
-    next_level_image = pygame.image.load("assets/menu background.png").convert_alpha()
-    
-    # Hent størrelsen på bildet for å sentrere det
-    image_rect = next_level_image.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
+def run_transition(screen, clock, image_path="next_level.png", duration=2.0):
+    """
+    Viser en transition med et bilde.
+    image_path: Filen som skal vises (bruk start-image eller next-level-image)
+    duration: Hvor lenge den vises i sekunder
+    """
+    # Last inn bildet
+    image = pygame.image.load(image_path).convert_alpha()
+    image = pygame.transform.scale(image, (screen.get_width(), screen.get_height()))
+    rect = image.get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
 
     timer = 0
-
-    while timer < 2.0:
+    while timer < duration:
         dt = clock.tick(60) / 1000.0
         timer += dt
 
@@ -17,9 +21,8 @@ def run_transition(screen, clock):
             if event.type == pygame.QUIT:
                 return False
 
-        screen.fill((0, 0, 0))  # Bakgrunn
-        screen.blit(next_level_image, image_rect)  # Tegn bildet
-
+        screen.fill((0, 0, 0))
+        screen.blit(image, rect)
         pygame.display.flip()
 
     return True
