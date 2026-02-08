@@ -1,4 +1,5 @@
 import pygame
+import src.sound as sound
 
 
 
@@ -70,6 +71,16 @@ class Player:
         if jump and self.on_ground:
             self.vel.y = -JUMP_VEL
             self.on_ground = False
+            # jumping sounds
+            if jump and self.on_ground:
+                self.vel.y = -JUMP_VEL
+                self.on_ground = False
+
+            if self is playerA:
+                sound.jump_a.play()
+            else:
+                sound.jump_b.play()
+
 
     def apply_friction(self, dt):
         self.vel.x -= self.vel.x * min(1.0, FRICTION * dt)
@@ -148,7 +159,7 @@ class Player:
     def draw(self, surf, font):
         surf.blit(self.image, self.rect)
 
-         # draw hp above head
+        # draw hp above head
         # ---- HP BAR ----
         bar_width = self.rect.width
         bar_height = 6
@@ -178,6 +189,17 @@ class Player:
 
     def take_damage(self, amount: int):
         self.hp = max(0, self.hp - amount)
+        # hit sounds
+        if self is playerA:
+            sound.hit_a.play()
+        else:
+            sound.hit_b.play()
+
+        if self.hp == 0:
+            if self is playerA:
+                sound.death_a.play()
+            else:
+                sound.death_b.play()
 
 
 playerA = Player(

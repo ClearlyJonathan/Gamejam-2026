@@ -1,6 +1,5 @@
 
 import pygame
-import src.playercontroller as pc
 
 from src.world import World
 from src.level_loader import build_test_level
@@ -12,11 +11,13 @@ from src.ldtk_collision_builder import build_ldtk_collision
 
 
 pygame.init()
+pygame.mixer.init()
+import src.sound as sound
+import src.playercontroller as pc
 hp_font = pygame.font.Font(None, 28)
 
 
 # Music shit
-pygame.mixer.init()
 MENU_MUSIC = "assets/music/New Composition #1.mp3"
 GAME_MUSIC = "assets/music/Jungle and Rainforest Sound Effects - Tropical Forest Ambiences from Costa Rica.mp3"
 pygame.mixer.music.load(MENU_MUSIC)
