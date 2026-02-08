@@ -1,34 +1,59 @@
 import json
-import pygame
-
-#Laster in LDtk prosjektfil og laster alle levler.
-#Tegner tiles på skjermen
-
-import json
+import os
 import pygame
 
 
 class LevelSystem:
 
-    def __init__(self, tileset_path):
+    def __init__(self, project_file, tileset_path):
+
+        with open(project_file, "r", encoding="utf-8") as f:
+            self.project = json.load(f)
+
+        self.project_dir = os.path.dirname(project_file)
 
         self.tileset = pygame.image.load(tileset_path).convert_alpha()
+
+        self.level_index = 0
         self.current_level = None
         self.tile_size = 64
+        
+    def load_level(self, index):
+        level_meta = self.project["levels"][index]
 
-    def load_level(self, level_file):
+        # Sjekk om nivået er eksternt
+        if self.project.get("externalLevels", False) and level_meta.get("externalRelPath"):
+            rel = level_meta["externalRelPath"]
+            path = os.path.join(self.project_dir, rel)
+            print("Loading external level:", path)
+            with open(path, "r", encoding="utf-8") as f:
+                self.current_level = json.load(f)
+        else:
+            print("Loading internal level:", level_meta["identifier"])
+            # Kopier nivået og sett layerInstances til tom liste hvis det er None
+            self.current_level = level_meta.copy()
+            if self.current_level["layerInstances"] is None:
+                self.current_level["layerInstances"] = []
 
-        with open(level_file, "r", encoding="utf-8") as f:
-            self.current_level = json.load(f)
+        self.level_index = index
+
+
+
+    def next_level(self):
+
+        self.level_index += 1
+
+        if self.level_index >= len(self.project["levels"]):
+            self.level_index = 0
+
+        self.load_level(self.level_index)
 
     def draw(self, surface):
 
         if not self.current_level:
             return
 
-        layers = self.current_level.get("layerInstances", [])
-
-        for layer in layers:
+        for layer in self.current_level["layerInstances"]:
 
             tiles = (
                 layer.get("gridTiles")

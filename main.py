@@ -73,21 +73,19 @@ playerB = pc.playerB
 stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
-levels = LevelSystem("assets/tilesetResizeResize.png")
+levels = LevelSystem(
+    "assets/ADAM.ldtk",
+    "assets/tilesetResizeResize.png"
+)
 
-level_list = [
-    "src/levels/map2.json",
-    "src/levels/map2.json",
-]
-
-current_level_index = 0
-
-levels.load_level(level_list[current_level_index])
+levels.load_level(0)
 
 events = LevelEvents()
 events.build(levels.current_level)
 
 build_ldtk_collision(world, levels)
+
+
 
 print(levels.current_level.keys())
 
@@ -117,7 +115,7 @@ while running:
         game_over = True
         winner = "B" if playerA.hp == 0 else "A"
     
-    print(playerA.hp)
+    #print(playerA.hp)
 
     # Player input
     playerA.handle_input(keys, dt)
@@ -138,26 +136,29 @@ while running:
 
         if not run_transition(screen, clock):
             running = False
+       
 
-        current_level_index += 1
-
-        if current_level_index >= len(level_list):
-            current_level_index = 0
+        levels.next_level()
 
         world.solids.clear()
         world.drawables.clear()
 
-        levels.load_level(level_list[current_level_index])
+        levels.next_level()
 
         events.build(levels.current_level)
         build_ldtk_collision(world, levels)
+
                 
                 
         playerA.pos.xy = (200, 200)
         playerA.hitbox.topleft = (200, 200)
 
-        playerB.pos.xy = (400, 200)
-        playerB.hitbox.topleft = (400, 200)
+        playerB.pos.xy = (200, 200)
+        playerB.hitbox.topleft = (200, 200)
+
+        print("Solids:", len(world.solids))
+        print("Layers:", len(levels.current_level["layerInstances"]))
+
 
 
     # Draw
