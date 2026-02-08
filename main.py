@@ -84,7 +84,24 @@ levels.load_level(0)
 events = LevelEvents()
 events.build(levels.current_level)
 
-build_ldtk_collision(world, levels)
+spawn_positions = build_ldtk_collision(world, levels)
+
+# initial spawn placement: center players on spawn tiles
+if len(spawn_positions) >= 2:
+    ts = getattr(levels, "tile_size", 64)
+    ax = spawn_positions[0][0] + ts // 2 - playerA.hitbox.width // 2
+    ay = spawn_positions[0][1] + ts - playerA.hitbox.height
+
+    bx = spawn_positions[1][0] + ts // 2 - playerB.hitbox.width // 2
+    by = spawn_positions[1][1] + ts - playerB.hitbox.height
+
+    playerA.pos.x, playerA.pos.y = ax, ay
+    playerA.hitbox.topleft = (ax, ay)
+    playerA.rect.topleft = playerA.hitbox.topleft
+
+    playerB.pos.x, playerB.pos.y = bx, by
+    playerB.hitbox.topleft = (bx, by)
+    playerB.rect.topleft = playerB.hitbox.topleft
 
 
 
@@ -139,25 +156,40 @@ while running:
 
         if not run_transition(screen, clock):
             running = False
-       
 
+        # advance to next level once
         levels.next_level()
 
+        # clear world objects before loading the new level
         world.solids.clear()
         world.drawables.clear()
-
-        levels.next_level()
+        if hasattr(world, 'triggers'):
+            world.triggers.clear()
 
         events.build(levels.current_level)
-        build_ldtk_collision(world, levels)
+        spawn_positions = build_ldtk_collision(world, levels)
 
-                
-                
-        playerA.pos.xy = (200, 200)
-        playerA.hitbox.topleft = (200, 200)
+        # center players on the new level's spawn tiles if available
+        if len(spawn_positions) >= 2:
+            ts = getattr(levels, "tile_size", 64)
+            ax = spawn_positions[0][0] + ts // 2 - playerA.hitbox.width // 2
+            ay = spawn_positions[0][1] + ts - playerA.hitbox.height
 
-        playerB.pos.xy = (200, 200)
-        playerB.hitbox.topleft = (200, 200)
+            bx = spawn_positions[1][0] + ts // 2 - playerB.hitbox.width // 2
+            by = spawn_positions[1][1] + ts - playerB.hitbox.height
+
+            playerA.pos.x, playerA.pos.y = ax, ay
+            playerA.hitbox.topleft = (ax, ay)
+            playerA.rect.topleft = playerA.hitbox.topleft
+
+            playerB.pos.x, playerB.pos.y = bx, by
+            playerB.hitbox.topleft = (bx, by)
+            playerB.rect.topleft = playerB.hitbox.topleft
+        else:
+            playerA.pos.xy = (200, 200)
+            playerA.hitbox.topleft = (200, 200)
+            playerB.pos.xy = (200, 200)
+            playerB.hitbox.topleft = (200, 200)
 
         print("Solids:", len(world.solids))
         print("Layers:", len(levels.current_level["layerInstances"]))
@@ -170,6 +202,11 @@ while running:
     for obj in world.drawables:
         # draw terrain blocks
         obj.draw(screen)
+
+    # draw door debug outlines (from LevelEvents)
+    if hasattr(events, 'doors'):
+        for d in events.doors:
+            pygame.draw.rect(screen, (0, 180, 255), d, 3)
 
     levels.draw(screen)
 
