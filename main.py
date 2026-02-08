@@ -5,11 +5,16 @@ from src.world import World
 from src.level_loader import build_test_level
 from src.stretcher import Stretcher
 from src.level_system import LevelSystem
+from src.menu import run_menu
 
 pygame.init()
-pygame.mixer.init()
 
-pygame.mixer.music.load("assets/music/Jungle and Rainforest Sound Effects - Tropical Forest Ambiences from Costa Rica.mp3")
+
+# Music shit
+pygame.mixer.init()
+MENU_MUSIC = "assets/music/New Composition #1.mp3"
+GAME_MUSIC = "assets/music/Jungle and Rainforest Sound Effects - Tropical Forest Ambiences from Costa Rica.mp3"
+pygame.mixer.music.load(MENU_MUSIC)
 pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(-1)
 
@@ -20,8 +25,20 @@ W, H = 1280, 720
 screen = pygame.display.set_mode((W, H))
 clock = pygame.time.Clock()
 pygame.display.set_caption("Suck and blow")
-
 FPS = 60
+
+
+#Menu
+choice = run_menu(screen, clock, "Suck and Blow")
+if choice == "quit":
+    pygame.quit()
+    raise SystemExit
+
+pygame.mixer.music.fadeout(1)
+pygame.mixer.music.load(GAME_MUSIC)
+pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.play(-1)
+
 
 # World + level
 world = World(W, H, gravity=1800.0)
@@ -102,3 +119,4 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
+
