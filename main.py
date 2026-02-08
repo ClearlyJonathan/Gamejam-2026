@@ -70,7 +70,7 @@ stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "src/map2.json",
+    "src/map1.json",
     "assets/tilesetResizeResize.png")
 
 #Laster fÃ¸rste level
@@ -131,7 +131,7 @@ while running:
 
     # highlight selection so you know what you're stretching
     stretcher.draw_gizmo(screen)
-
+    
     playerA.draw(screen, hp_font)
     playerB.draw(screen, hp_font)
 
