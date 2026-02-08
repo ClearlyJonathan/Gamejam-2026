@@ -18,12 +18,13 @@ Gruppemedlemmer:
 ## Controls
 
 #### Player A
+- **← / →** – Bevegelse venstre / høyre  
+- **↑** – Hopp  
+
+#### Player B
 - **A / D** – Bevegelse venstre / høyre  
 - **W** – Hopp  
 
-#### Player B
-- **← / →** – Bevegelse venstre / høyre  
-- **↑** – Hopp  
 
 ### Stretch Tool
 - **Q / E / M / N (+ Shift)** – Strekke / krympe terreng  
