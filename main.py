@@ -77,7 +77,7 @@ stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "assets/ADAM.ldtk",
+    "assets/ADAM.json",
     "assets/tilesetResizeResize.png"
 )
 
@@ -100,10 +100,16 @@ if len(spawn_positions) >= 2:
     playerA.pos.x, playerA.pos.y = ax, ay
     playerA.hitbox.topleft = (ax, ay)
     playerA.rect.topleft = playerA.hitbox.topleft
-
+    # reset player state on level load
+    playerA.vel = pygame.Vector2(0, 0)
+    playerA.on_ground = False
+    playerA.hp = playerA.max_hp
     playerB.pos.x, playerB.pos.y = bx, by
     playerB.hitbox.topleft = (bx, by)
     playerB.rect.topleft = playerB.hitbox.topleft
+    playerB.vel = pygame.Vector2(0, 0)
+    playerB.on_ground = False
+    playerB.hp = playerB.max_hp
 
 
 print(levels.current_level.keys())
@@ -231,6 +237,9 @@ while running:
             playerA.pos.x, playerA.pos.y = ax, ay
             playerA.hitbox.topleft = (ax, ay)
             playerA.rect.topleft = playerA.hitbox.topleft
+            playerA.vel = pygame.Vector2(0, 0)
+            playerA.on_ground = False
+            playerA.hp = playerA.max_hp
 
             playerB.pos.x, playerB.pos.y = bx, by
             playerB.hitbox.topleft = (bx, by)
@@ -249,8 +258,10 @@ while running:
             respawnB = (200, 200)
 
 
+        print("Loaded level:", levels.current_level.get("identifier"))
         print("Solids:", len(world.solids))
-        print("Layers:", len(levels.current_level["layerInstances"]))
+        print("Layers:", len(levels.current_level.get("layerInstances", [])))
+
 
 
 
@@ -260,6 +271,9 @@ while running:
     for obj in world.drawables:
         # draw terrain blocks
         obj.draw(screen)
+        # highlight stretchable objects with a subtle grey outline
+        if hasattr(obj, "min_w") or hasattr(obj, "min_h"):
+            pygame.draw.rect(screen, (120, 120, 120), obj.rect, 2)
 
     # draw door debug outlines (from LevelEvents)
     if hasattr(events, 'doors'):

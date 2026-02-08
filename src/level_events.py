@@ -1,7 +1,6 @@
 import pygame
 
 class LevelEvents:
-
     def __init__(self):
         self.doors = []
         self.killers = []
@@ -10,11 +9,9 @@ class LevelEvents:
         self.doors.clear()
         self.killers.clear()
 
-        # Sørg for at layerInstances alltid er en liste
         for layer in level_data.get("layerInstances") or []:
             name = layer["__identifier"]
             size = layer["__gridSize"]
-
             tiles = layer.get("gridTiles") or layer.get("autoLayerTiles") or []
 
             for tile in tiles:
@@ -34,11 +31,14 @@ class LevelEvents:
 
     def check(self, players):
         # First, check killers
-        for p in players:
+        for idx, p in enumerate(players):
             player_rect = p.hitbox
             for k in self.killers:
-                if player_rect.colliderect(k):
+                # be slightly forgiving with killer overlap
+                if player_rect.colliderect(k.inflate(4, 4)):
                     p.hp = 0
+                    print(f"[LevelEvents] Player {idx} touched killer -> hp=0")
+                    break
 
         # Require every player to be overlapping a door (they may share the same door)
         # Debug: report door counts and each player's overlap
