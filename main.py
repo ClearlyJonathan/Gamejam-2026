@@ -1,4 +1,3 @@
-
 import pygame
 
 from src.world import World
@@ -18,6 +17,9 @@ pygame.mixer.init()
 import src.sound as sound
 import src.playercontroller as pc
 hp_font = pygame.font.Font(None, 28)
+timer_font = pygame.font.Font(None, 36)
+start_time = pygame.time.get_ticks()  # ms since pygame.init()
+
 
 
 
@@ -104,13 +106,55 @@ if len(spawn_positions) >= 2:
     playerB.rect.topleft = playerB.hitbox.topleft
 
 
-
 print(levels.current_level.keys())
 
 running = True
+# Keep track of where to respawn players
+respawnA = None  # (x, y)
+respawnB = None  # (x, y)
+
+# ✅ CHANGE: set initial respawn points (so respawn works on level 0)
+respawnA = (playerA.hitbox.x, playerA.hitbox.y)
+respawnB = (playerB.hitbox.x, playerB.hitbox.y)
+
+def respawn_players():
+    # reset hp
+    playerA.hp = playerA.max_hp
+    playerB.hp = playerB.max_hp
+
+    # reset velocity so they don't keep momentum
+    playerA.vel.xy = (0, 0)
+    playerB.vel.xy = (0, 0)
+
+    # move to respawn positions
+    if respawnA is not None:
+        ax, ay = respawnA
+        playerA.pos.xy = (ax, ay)
+        playerA.hitbox.topleft = (ax, ay)
+        playerA.rect.topleft = playerA.hitbox.topleft
+
+    if respawnB is not None:
+        bx, by = respawnB
+        playerB.pos.xy = (bx, by)
+        playerB.hitbox.topleft = (bx, by)
+        playerB.rect.topleft = playerB.hitbox.topleft
+
+    # ✅ CHANGE: removed these lines (they crash / don't work):
+    # playerA.pos.x, playerA.pos.y = ax, ay
+    # playerB.pos.x, playerB.pos.y = bx, by
+    # respawnA = (ax, ay)
+    # respawnB = (bx, by)
+
+respawn_cooldown = 0.0
+
 
 while running:
     dt = clock.tick(FPS) / 1000.0
+    respawn_cooldown = max(0.0, respawn_cooldown - dt)
+    if (playerA.hp == 0 or playerB.hp == 0) and respawn_cooldown == 0.0:
+        respawn_players()
+        respawn_cooldown = 1.0  # 1 second delay before another respawn can happen
+
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -130,9 +174,10 @@ while running:
     elif action == "shrink":
         playerB.take_damage(1)
 
-    if playerA.hp == 0 or playerB.hp == 0:
-        game_over = True
-        winner = "B" if playerA.hp == 0 else "A"
+    # ✅ CHANGE: removed duplicate respawn (it bypassed cooldown)
+    # if playerA.hp == 0 or playerB.hp == 0:
+    #     respawn_players()
+
     
     #print(playerA.hp)
 
@@ -152,7 +197,12 @@ while running:
 
     next_level = events.check([playerA, playerB])
 
+        
+
     if next_level:
+        # ✅ CHANGE: removed these lines (ax/ay might be stale here)
+        # respawnA = (ax, ay)
+        # respawnB = (bx, by)
 
         if not run_transition(screen, clock):
             running = False
@@ -185,11 +235,19 @@ while running:
             playerB.pos.x, playerB.pos.y = bx, by
             playerB.hitbox.topleft = (bx, by)
             playerB.rect.topleft = playerB.hitbox.topleft
+
+            # ✅ CHANGE: set respawn points for the new level
+            respawnA = (ax, ay)
+            respawnB = (bx, by)
+
         else:
             playerA.pos.xy = (200, 200)
             playerA.hitbox.topleft = (200, 200)
             playerB.pos.xy = (200, 200)
             playerB.hitbox.topleft = (200, 200)
+            respawnA = (200, 200)
+            respawnB = (200, 200)
+
 
         print("Solids:", len(world.solids))
         print("Layers:", len(levels.current_level["layerInstances"]))
@@ -216,6 +274,14 @@ while running:
     playerA.draw(screen, hp_font)
     playerB.draw(screen, hp_font)
 
+    # ----- TIMER (top-left) -----
+    elapsed_ms = pygame.time.get_ticks() - start_time
+    elapsed_sec = elapsed_ms // 1000
+    minutes = elapsed_sec // 60
+    seconds = elapsed_sec % 60
+
+    timer_surf = timer_font.render(f"{minutes:02}:{seconds:02}", True, (255, 255, 255))
+    screen.blit(timer_surf, (10, 10))
 
     pygame.display.flip()
 
