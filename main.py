@@ -75,7 +75,7 @@ stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "assets/ADAM.ldtk",
+    "assets/ADAM.json",
     "assets/tilesetResizeResize.png"
 )
 
@@ -136,31 +136,29 @@ while running:
     next_level = events.check([playerA, playerB])
 
     if next_level:
-
         if not run_transition(screen, clock):
             running = False
-       
+            break
 
         levels.next_level()
 
+        # Tøm gamle world.solids og drawables
         world.solids.clear()
         world.drawables.clear()
-
-        levels.next_level()
 
         events.build(levels.current_level)
         build_ldtk_collision(world, levels)
 
-                
-                
+        # Resett spillerposisjon
         playerA.pos.xy = (200, 200)
         playerA.hitbox.topleft = (200, 200)
-
         playerB.pos.xy = (200, 200)
         playerB.hitbox.topleft = (200, 200)
 
+        print("Loaded level:", levels.current_level.get("identifier"))
         print("Solids:", len(world.solids))
-        print("Layers:", len(levels.current_level["layerInstances"]))
+        print("Layers:", len(levels.current_level.get("layerInstances", [])))
+
 
 
 
