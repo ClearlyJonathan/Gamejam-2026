@@ -18,6 +18,9 @@ pygame.mixer.init()
 import src.sound as sound
 import src.playercontroller as pc
 hp_font = pygame.font.Font(None, 28)
+timer_font = pygame.font.Font(None, 36)
+start_time = pygame.time.get_ticks()  # ms since pygame.init()
+
 
 
 
@@ -34,12 +37,12 @@ pygame.mixer.music.play(-1)
 W, H = 1280, 720
 screen = pygame.display.set_mode((W, H))
 clock = pygame.time.Clock()
-pygame.display.set_caption("Suck and blow")
+pygame.display.set_caption("Grow And Degrow")
 FPS = 60
 
 
 #Menu
-choice = run_menu(screen, clock, "Suck and Blow")
+choice = run_menu(screen, clock, "Grow And Degrow")
 if choice == "quit":
     pygame.quit()
     raise SystemExit
@@ -114,6 +117,9 @@ if len(spawn_positions) >= 2:
 print(levels.current_level.keys())
 
 running = True
+game_over = False
+frozen_time_ms = None
+
 
 while running:
     dt = clock.tick(FPS) / 1000.0
@@ -165,6 +171,8 @@ while running:
 
         # advance to next level once
         levels.next_level()
+        start_time = pygame.time.get_ticks()
+
 
         # clear world objects before loading the new level
         world.solids.clear()
@@ -232,6 +240,24 @@ while running:
 
     playerA.draw(screen, hp_font)
     playerB.draw(screen, hp_font)
+
+    # ----- TIMER (top-left) -----
+# ----- TIMER (top-left) -----
+    if not game_over:
+        elapsed_ms = pygame.time.get_ticks() - start_time
+    else:
+        if frozen_time_ms is None:
+            frozen_time_ms = pygame.time.get_ticks() - start_time
+        elapsed_ms = frozen_time_ms
+
+    elapsed_sec = elapsed_ms // 1000
+    minutes = elapsed_sec // 60
+    seconds = elapsed_sec % 60
+
+    timer_surf = timer_font.render(f"{minutes:02}:{seconds:02}", True, (255, 255, 255))
+    screen.blit(timer_surf, (10, 10))
+
+
 
 
     pygame.display.flip()
