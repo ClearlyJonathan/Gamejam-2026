@@ -23,7 +23,7 @@ class LevelSystem:
         self.tileset = pygame.image.load(tileset_path).convert_alpha()
 
         self.current_level = None
-        self.tile_size = 32   
+        self.tile_size = 64   
 
 
     def load_level(self, level_name):

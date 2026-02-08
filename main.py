@@ -7,6 +7,9 @@ from src.stretcher import Stretcher
 from src.level_system import LevelSystem
 from src.menu import run_menu
 
+from src.ldtk_collision_builder import build_ldtk_collision
+
+
 pygame.init()
 
 
@@ -42,7 +45,7 @@ pygame.mixer.music.play(-1)
 
 # World + level
 world = World(W, H, gravity=1800.0)
-build_test_level(world)  # fills world.solids with Wall objects :contentReference[oaicite:1]{index=1}
+#build_test_level(world)  # fills world.solids with Wall objects :contentReference[oaicite:1]{index=1}
 #hei
 # Make sure the same objects are drawable + selectable
 # (only do this if your loader doesn't already add drawables)
@@ -65,10 +68,11 @@ stretcher = Stretcher(speed=6)
 #Starte/Loade levelsene:
 levels = LevelSystem(
     "ldtk.json",
-    "assets/tilesetResize.png")
+    "assets/tilesetResizeResize.png")
 
 #Laster fÃ¸rste level
-levels.load_level("Level_0")
+levels.load_level("AutoLayers_advanced_demo")
+build_ldtk_collision(world, levels)
 
 
 
