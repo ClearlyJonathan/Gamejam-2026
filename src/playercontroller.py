@@ -28,11 +28,19 @@ class Player:
         self.images_right = []
         self.index = 0
         self.counter = 0
+        self.images_jump = []
+        self.index2 = 0
+        self.counter2 = 0
         for num in range(1,5):
             img_right = pygame.image.load(f"src/sprites/green_jump{num}.png")
             img_right = pygame.transform.scale(img_right, (40, 60))
             self.images_right.append(img_right)
         self.image = self.images_right[self.index]
+        for num in range(1,30):
+            img_jump = pygame.image.load(f"src/sprites/green_jump{num}.png")
+            img_jump = pygame.transform.scale(img_jump, (40, 60))
+            self.images_jump.append(img_jump)
+        self.image = self.images_jump[self.index2]
         self.rect = pygame.Rect(x, y, 40, 60)         # visual
         self.hitbox = pygame.Rect(x + 4, y + 6, 40, 60) # collision (tweak)
 
@@ -142,6 +150,14 @@ class Player:
             self.counter = 0
             self.index = 0
             self.image = self.images_right[self.index]
+        if self.vel.y < 0:
+            self.counter2 += 1
+            if self.counter2 > walk_cooldown:
+                self.counter2 = 0
+                self.index2 += 1
+                if self.index2 >= len(self.images_jump):
+                    self.index2 = 0
+                self.image = self.images_jump[self.index2]
 
         self.rect.midbottom = self.hitbox.midbottom
 
@@ -184,11 +200,19 @@ class Player1:
         self.images_right = []
         self.index = 0
         self.counter = 0
+        self.images_jump = []
+        self.index2 = 0
+        self.counter2 = 0
         for num in range(1,5):
             img_right = pygame.image.load(f"src/sprites/pink_jump{num}.png")
             img_right = pygame.transform.scale(img_right, (40, 60))
             self.images_right.append(img_right)
         self.image = self.images_right[self.index]
+        for num in range(1,25):
+            img_jump = pygame.image.load(f"src/sprites/pink_jump{num}.png")
+            img_jump = pygame.transform.scale(img_jump, (40, 60))
+            self.images_jump.append(img_jump)
+        self.image = self.images_jump[self.index2]
         self.rect = pygame.Rect(x, y, 40, 60)         # visual
         self.hitbox = pygame.Rect(x + 4, y + 6, 40, 60) # collision (tweak)
 
@@ -298,6 +322,15 @@ class Player1:
             self.counter = 0
             self.index = 0
             self.image = self.images_right[self.index]
+        if self.vel.y < 0:
+            self.counter2 += 1
+            if self.counter2 > walk_cooldown:
+                self.counter2 = 0
+                self.index2 += 1
+                if self.index2 >= len(self.images_jump):
+                    self.index2 = 0
+                self.image = self.images_jump[self.index2]
+
 
         self.rect.midbottom = self.hitbox.midbottom
 
