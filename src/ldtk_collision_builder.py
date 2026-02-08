@@ -14,7 +14,8 @@ def build_ldtk_collision(world, level_system):
         name = layer["__identifier"]
 
         # velg hvilke layers som skal gi collision
-        if name not in ("Collision", "StretchTerrain", "Door", "Killer"):
+        # include Spawn so we can collect spawn positions
+        if name not in ("Collision", "StretchTerrain", "Door", "Killer", "Spawn"):
             continue
 
         # stretch flag
@@ -33,6 +34,7 @@ def build_ldtk_collision(world, level_system):
             for tile in tiles:
                 x, y = tile["px"]
                 spawn_positions.append((x, y))
+            # nothing to add to solids/drawables for spawn
             continue
 
         for tile in tiles:
