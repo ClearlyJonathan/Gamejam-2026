@@ -13,21 +13,27 @@ MOVE_ACCEL = 3500.0       # px/s^2
 MAX_SPEED = 420.0         # px/s
 FRICTION = 12.0           # higher = more “snappy” stop
 JUMP_VEL = 720.0          # px/s upward
-SHOULD_APPLY_GRAVITY = False # This is for debugging, gravity since I'm not sure if we have physics yet
+SHOULD_APPLY_GRAVITY = True # This is for debugging, gravity since I'm not sure if we have physics yet
+
+# Important for collision
+"""
+    solids = walls + crates + platforms   # things that block movement
+    triggers = coins + checkpoints        # things that overlap (not added yet)
+    enemies = enemy_list                  # special handling
+
+"""
 
 class Player:
     def __init__(self, x, y, color, controls):
-        self.rect = pygame.Rect(x, y, 40, 60)
+        self.rect = pygame.Rect(x, y, 40, 60)          # visual
+        self.hitbox = pygame.Rect(x + 4, y + 6, 32, 52) # collision (tweak)
+
         self.color = color
         self.controls = controls
 
-        self.pos = pygame.Vector2(self.rect.topleft)
+        self.pos = pygame.Vector2(self.hitbox.topleft) # track hitbox pos using dillu hitbox system
         self.vel = pygame.Vector2(0, 0)
         self.on_ground = False
-
-        # IMPORTANT- For debugging.
-        if SHOULD_APPLY_GRAVITY == False:
-            GRAVITY = False
 
     def handle_input(self, keys, dt):
         ax = 0.0
@@ -60,31 +66,59 @@ class Player:
         if abs(self.vel.x) < 5:
             self.vel.x = 0
 
-    def update(self, dt):
-        # Gravity
-        self.vel.y += GRAVITY * dt
+    # Important function do not touch. If you want to add collidables, add it using the world class.
+    def _move_and_collide(self, dt, solids):
+        # --- X axis ---
+        self.pos.x += self.vel.x * dt
+        self.hitbox.x = round(self.pos.x)
 
-        self.pos += self.vel * dt
-        self.rect.topleft = (round(self.pos.x), round(self.pos.y))
+        for s in solids:
+            r = s.rect if hasattr(s, "rect") else s  # normalize to pygame.Rect
+            if self.hitbox.colliderect(r):
+                if self.vel.x > 0:
+                    self.hitbox.right = r.left
+                elif self.vel.x < 0:
+                    self.hitbox.left = r.right
+                self.pos.x = self.hitbox.x
+                self.vel.x = 0
 
-        # Simple ground collision - Change when a better one has been made
-        if self.rect.bottom >= GROUND_Y:
-            self.rect.bottom = GROUND_Y
-            self.pos.y = self.rect.y
-            self.vel.y = 0
-            self.on_ground = True
-        else:
-            self.on_ground = False
 
-        # Keep on screen horizontally
-        if self.rect.left < 0:
-            self.rect.left = 0
-            self.pos.x = self.rect.x
+        # --- Y axis ---
+        self.pos.y += self.vel.y * dt
+        self.hitbox.y = round(self.pos.y)
+
+        self.on_ground = False
+        for s in solids:
+            r = s.rect if hasattr(s, "rect") else s  # normalize to pygame.Rect
+
+            if self.hitbox.colliderect(r):
+                if self.vel.y > 0:
+                    # falling down, hit the top of something
+                    self.hitbox.bottom = r.top
+                    self.on_ground = True
+                elif self.vel.y < 0:
+                    # moving up, hit the bottom of something
+                    self.hitbox.top = r.bottom
+
+                self.pos.y = self.hitbox.y
+                self.vel.y = 0
+
+
+    def update(self, dt, world):
+        if SHOULD_APPLY_GRAVITY:
+            self.vel.y += world.gravity * dt
+
+        self._move_and_collide(dt, world.solids)
+        if self.hitbox.left < 0:
+            self.hitbox.left = 0
+            self.pos.x = self.hitbox.x
             self.vel.x = 0
-        if self.rect.right > W:
-            self.rect.right = W
-            self.pos.x = self.rect.x
+        if self.hitbox.right > world.width:
+            self.hitbox.right = world.width
+            self.pos.x = self.hitbox.x
             self.vel.x = 0
+
+        self.rect.midbottom = self.hitbox.midbottom
 
     def draw(self, surf):
         pygame.draw.rect(surf, self.color, self.rect)
