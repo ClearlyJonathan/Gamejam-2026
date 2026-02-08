@@ -131,7 +131,11 @@ class Player:
         #handle animation
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         walk_cooldown = 10
+=======
+        walk_cooldown = 30
+>>>>>>> Stashed changes
 =======
         walk_cooldown = 30
 >>>>>>> Stashed changes
