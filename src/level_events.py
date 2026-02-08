@@ -1,7 +1,6 @@
 import pygame
 
 class LevelEvents:
-
     def __init__(self):
         self.doors = []
         self.killers = []
@@ -10,11 +9,9 @@ class LevelEvents:
         self.doors.clear()
         self.killers.clear()
 
-        # Sørg for at layerInstances alltid er en liste
         for layer in level_data.get("layerInstances") or []:
             name = layer["__identifier"]
             size = layer["__gridSize"]
-
             tiles = layer.get("gridTiles") or layer.get("autoLayerTiles") or []
 
             for tile in tiles:

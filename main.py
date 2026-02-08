@@ -75,7 +75,7 @@ stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "assets/ADAM.ldtk",
+    "assets/ADAM.json",
     "assets/tilesetResizeResize.png"
 )
 
@@ -153,7 +153,6 @@ while running:
     next_level = events.check([playerA, playerB])
 
     if next_level:
-
         if not run_transition(screen, clock):
             running = False
 
@@ -191,8 +190,10 @@ while running:
             playerB.pos.xy = (200, 200)
             playerB.hitbox.topleft = (200, 200)
 
+        print("Loaded level:", levels.current_level.get("identifier"))
         print("Solids:", len(world.solids))
-        print("Layers:", len(levels.current_level["layerInstances"]))
+        print("Layers:", len(levels.current_level.get("layerInstances", [])))
+
 
 
 
