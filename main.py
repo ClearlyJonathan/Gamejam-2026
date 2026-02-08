@@ -9,6 +9,9 @@ from src.menu import run_menu
 
 from src.ldtk_collision_builder import build_ldtk_collision
 
+from src.level_events import LevelEvents
+from src.level_transition import run_transition
+
 
 pygame.init()
 pygame.mixer.init()
@@ -72,15 +75,20 @@ stretcher = Stretcher(speed=6)
 
 #Starte/Loade levelsene:
 levels = LevelSystem(
-    "src/map1.json",
-    "assets/tilesetResizeResize.png")
+    "assets/ADAM.ldtk",
+    "assets/tilesetResizeResize.png"
+)
 
+levels.load_level(0)
 
-#Laster fÃ¸rste level
-levels.load_level("AutoLayers_advanced_demo")
+events = LevelEvents()
+events.build(levels.current_level)
+
 build_ldtk_collision(world, levels)
 
 
+
+print(levels.current_level.keys())
 
 running = True
 
@@ -109,7 +117,7 @@ while running:
         game_over = True
         winner = "B" if playerA.hp == 0 else "A"
     
-    print(playerA.hp)
+    #print(playerA.hp)
 
     # Player input
     playerA.handle_input(keys, dt)
@@ -124,6 +132,37 @@ while running:
     playerA.update(dt, world)  # needs update(dt, world) :contentReference[oaicite:2]{index=2}
     playerB.update(dt, world)
     # Switch level when both are within 1 player-width of the right edge
+
+    next_level = events.check([playerA, playerB])
+
+    if next_level:
+
+        if not run_transition(screen, clock):
+            running = False
+       
+
+        levels.next_level()
+
+        world.solids.clear()
+        world.drawables.clear()
+
+        levels.next_level()
+
+        events.build(levels.current_level)
+        build_ldtk_collision(world, levels)
+
+                
+                
+        playerA.pos.xy = (200, 200)
+        playerA.hitbox.topleft = (200, 200)
+
+        playerB.pos.xy = (200, 200)
+        playerB.hitbox.topleft = (200, 200)
+
+        print("Solids:", len(world.solids))
+        print("Layers:", len(levels.current_level["layerInstances"]))
+
+
 
     # Draw
     screen.fill((20, 22, 28))
