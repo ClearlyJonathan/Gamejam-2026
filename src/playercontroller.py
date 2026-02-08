@@ -44,6 +44,9 @@ class Player:
         self.on_ground = False
         self.hp = 100
         self.max_hp = 100
+        # simple damage cooldown to avoid dying instantly from overlapping triggers
+        self._last_damage_ms = 0
+        self._damage_cooldown_ms = 200
 
     def handle_input(self, keys, dt):
         ax = 0.0
@@ -177,6 +180,10 @@ class Player:
         pygame.draw.rect(surf, color, hp_rect)
 
     def take_damage(self, amount: int):
+        now = pygame.time.get_ticks()
+        if now - self._last_damage_ms < self._damage_cooldown_ms:
+            return
+        self._last_damage_ms = now
         self.hp = max(0, self.hp - amount)
 
 

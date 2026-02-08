@@ -15,3 +15,6 @@ class World:
 
     def add_drawable(self, obj):
         self.drawables.append(obj)
+
+    def add_trigger(self, trigger):
+        self.triggers.append(trigger)

@@ -76,19 +76,77 @@ def build_ldtk_collision(world, level_system):
     if not level:
         return
 
+    spawn_positions = []
+    
     for layer in level.get("layerInstances", []):
         name = layer["__identifier"]
         layer_id = layer.get("layerDefUid")
 
         # -------------------------------
-        # Stretchable terrain layer (ID: 112)
+        # Stretchable tile layer (ID: 107)
+        # Clickable + stretchable + collidable
         # -------------------------------
-        if name == "StretchTerrain":  # Only the "StretchTerrain" layer is stretchable
+        if name == "Tiles":
             groups = _build_stretch_groups(level_system, layer)
             print(f"Layer '{name}' (ID: {layer_id}): found {len(groups)} stretchable groups")
             for group in groups:
                 world.add_drawable(group)   # selectable + stretchable
-                world.add_solid(group)      # one big rect collider
+                world.add_solid(group)      # also add collision
             continue
 
-        # Non-stretchable layers are skipped (they stay in level_system.draw)
+        # -------------------------------
+        # Collidable terrain
+        # Collision (ID: 111) - non-stretchable collision
+        # StretchTerrain (ID: 113) - stretchable + collidable
+        # -------------------------------
+        if name == "Collision":
+            tile_size = layer["__gridSize"]
+            tiles = layer.get("gridTiles") or layer.get("autoLayerTiles") or []
+            
+            for tile in tiles:
+                x, y = tile["px"]
+                world.add_solid(Wall(x, y, tile_size, tile_size))
+            
+            print(f"Layer '{name}' (ID: {layer_id}): added {len(tiles)} collision tiles")
+            continue
+
+        if name == "StretchTerrain":
+            groups = _build_stretch_groups(level_system, layer)
+            print(f"Layer '{name}' (ID: {layer_id}): found {len(groups)} stretchable groups")
+            for group in groups:
+                world.add_drawable(group)   # selectable + stretchable
+                world.add_solid(group)      # also add collision
+            continue
+
+        # -------------------------------
+        # Spawn points (ID: 117)
+        # Extract positions for player spawning
+        # -------------------------------
+        if name == "Spawn":
+            tile_size = layer["__gridSize"]
+            tiles = layer.get("gridTiles") or layer.get("autoLayerTiles") or []
+            
+            for tile in tiles:
+                x, y = tile["px"]
+                spawn_positions.append((x, y))
+            
+            print(f"Layer '{name}' (ID: {layer_id}): found {len(spawn_positions)} spawn points")
+            continue
+
+        # -------------------------------
+        # Trigger zones
+        # Killer (ID: 115) + Door (ID: 114)
+        # -------------------------------
+        if name in ["Killer", "Door"]:
+            tile_size = layer["__gridSize"]
+            tiles = layer.get("gridTiles") or layer.get("autoLayerTiles") or []
+            
+            for tile in tiles:
+                x, y = tile["px"]
+                trigger_rect = pygame.Rect(x, y, tile_size, tile_size)
+                world.add_trigger({"type": name, "rect": trigger_rect})
+            
+            print(f"Layer '{name}' (ID: {layer_id}): added {len(tiles)} trigger zones")
+            continue
+    
+    return spawn_positions
