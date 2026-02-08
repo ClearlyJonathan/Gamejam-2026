@@ -6,7 +6,6 @@ import src.level_loader as level
 
 
 from level_system import LevelSystem
-import src.playercontroller
 
 
 # pygame setup do not touch - Just temporarily so i can see my playerr
