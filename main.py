@@ -86,6 +86,7 @@ while running:
 
     # highlight selection so you know what you're stretching
     stretcher.draw_gizmo(screen)
+    levels.draw(screen)
 
     playerA.draw(screen)
     playerB.draw(screen)
