@@ -1,3 +1,4 @@
+
 import pygame
 import src.playercontroller as pc
 
@@ -60,7 +61,6 @@ pc.W = W
 pc.H = H
 pc.GROUND_Y = GROUND_Y
 pc.GRAVITY = 1800
-pc.SHOULD_APPLY_GRAVITY = False
 playerA = pc.playerA
 playerB = pc.playerB
 #pc.SHOULD_APPLY_GRAVITY = False
@@ -123,11 +123,11 @@ while running:
     # Draw
     screen.fill((20, 22, 28))
 
-    levels.draw(screen)
-
     for obj in world.drawables:
         # draw terrain blocks
         obj.draw(screen)
+
+    levels.draw(screen)
 
     # highlight selection so you know what you're stretching
     stretcher.draw_gizmo(screen)
