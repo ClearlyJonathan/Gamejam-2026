@@ -18,6 +18,7 @@ pygame.mixer.init()
 import src.sound as sound
 import src.playercontroller as pc
 hp_font = pygame.font.Font(None, 28)
+gameover_image = None
 
 
 
@@ -36,6 +37,13 @@ screen = pygame.display.set_mode((W, H))
 clock = pygame.time.Clock()
 pygame.display.set_caption("Suck and blow")
 FPS = 60
+
+# load gameover image (scaled to window) if available
+try:
+    _go = pygame.image.load("assets/gameover_screen.png").convert_alpha()
+    gameover_image = pygame.transform.smoothscale(_go, (W, H))
+except Exception:
+    gameover_image = None
 
 
 #Menu
@@ -114,6 +122,50 @@ if len(spawn_positions) >= 2:
 print(levels.current_level.keys())
 
 running = True
+game_over = False
+winner = None
+
+def restart_current_level():
+    # clear world objects and reload the current level, then place players on spawn
+    world.solids.clear()
+    world.drawables.clear()
+    if hasattr(world, 'triggers'):
+        world.triggers.clear()
+
+    # reload the same level index
+    levels.load_level(levels.level_index)
+    events.build(levels.current_level)
+    sp = build_ldtk_collision(world, levels)
+
+    # center players on spawn tiles if available
+    if len(sp) >= 2:
+        ts = getattr(levels, "tile_size", 64)
+        ax = sp[0][0] + ts // 2 - playerA.hitbox.width // 2
+        ay = sp[0][1] + ts - playerA.hitbox.height
+
+        bx = sp[1][0] + ts // 2 - playerB.hitbox.width // 2
+        by = sp[1][1] + ts - playerB.hitbox.height
+
+        playerA.pos.x, playerA.pos.y = ax, ay
+        playerA.hitbox.topleft = (ax, ay)
+        playerA.rect.topleft = playerA.hitbox.topleft
+        playerA.vel = pygame.Vector2(0, 0)
+        playerA.on_ground = False
+        playerA.hp = playerA.max_hp
+
+        playerB.pos.x, playerB.pos.y = bx, by
+        playerB.hitbox.topleft = (bx, by)
+        playerB.rect.topleft = playerB.hitbox.topleft
+        playerB.vel = pygame.Vector2(0, 0)
+        playerB.on_ground = False
+        playerB.hp = playerB.max_hp
+    else:
+        playerA.pos.xy = (200, 200)
+        playerA.hitbox.topleft = (200, 200)
+        playerB.pos.xy = (200, 200)
+        playerB.hitbox.topleft = (200, 200)
+
+    return sp
 
 while running:
     dt = clock.tick(FPS) / 1000.0
@@ -121,6 +173,15 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        # When game is over we only listen for restart
+        if game_over:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                # restart current level
+                spawn_positions = restart_current_level()
+                game_over = False
+                winner = None
+            continue
 
         # Left click to select a terrain object to stretch
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -137,75 +198,77 @@ while running:
         playerB.take_damage(1)
 
     if playerA.hp == 0 or playerB.hp == 0:
+        # set game-over state instead of blitting raw image here —
+        # drawing continues later in the loop and would overwrite a direct blit.
         winner = "B" if playerA.hp == 0 else "A"
         print(f"Game Over! Player {winner} won!")
-        running = False
+        game_over = True
+        
     
-    #print(playerA.hp)
+    # Only update players / physics / level events when not game over
+    if not game_over:
+        # Player input
+        playerA.handle_input(keys, dt)
+        if not (keys[playerA.controls["left"]] or keys[playerA.controls["right"]]):
+            playerA.apply_friction(dt)
 
-    # Player input
-    playerA.handle_input(keys, dt)
-    if not (keys[playerA.controls["left"]] or keys[playerA.controls["right"]]):
-        playerA.apply_friction(dt)
+        playerB.handle_input(keys, dt)
+        if not (keys[playerB.controls["left"]] or keys[playerB.controls["right"]]):
+            playerB.apply_friction(dt)
 
-    playerB.handle_input(keys, dt)
-    if not (keys[playerB.controls["left"]] or keys[playerB.controls["right"]]):
-        playerB.apply_friction(dt)
+        # Physics + collision vs world.solids (this is the important part)
+        playerA.update(dt, world)  # needs update(dt, world) :contentReference[oaicite:2]{index=2}
+        playerB.update(dt, world)
 
-    # Physics + collision vs world.solids (this is the important part)
-    playerA.update(dt, world)  # needs update(dt, world) :contentReference[oaicite:2]{index=2}
-    playerB.update(dt, world)
-    # Switch level when both are within 1 player-width of the right edge
+        next_level = events.check([playerA, playerB])
 
-    next_level = events.check([playerA, playerB])
+        if next_level:
 
-    if next_level:
+            if not run_transition(screen, clock):
+                running = False
 
-        if not run_transition(screen, clock):
-            running = False
+            # advance to next level once
+            levels.next_level()
 
-        # advance to next level once
-        levels.next_level()
+            # clear world objects before loading the new level
+            world.solids.clear()
+            world.drawables.clear()
+            if hasattr(world, 'triggers'):
+                world.triggers.clear()
 
-        # clear world objects before loading the new level
-        world.solids.clear()
-        world.drawables.clear()
-        if hasattr(world, 'triggers'):
-            world.triggers.clear()
+            events.build(levels.current_level)
+            spawn_positions = build_ldtk_collision(world, levels)
 
-        events.build(levels.current_level)
-        spawn_positions = build_ldtk_collision(world, levels)
+            # center players on the new level's spawn tiles if available
+            if len(spawn_positions) >= 2:
+                ts = getattr(levels, "tile_size", 64)
+                ax = spawn_positions[0][0] + ts // 2 - playerA.hitbox.width // 2
+                ay = spawn_positions[0][1] + ts - playerA.hitbox.height
 
-        # center players on the new level's spawn tiles if available
-        if len(spawn_positions) >= 2:
-            ts = getattr(levels, "tile_size", 64)
-            ax = spawn_positions[0][0] + ts // 2 - playerA.hitbox.width // 2
-            ay = spawn_positions[0][1] + ts - playerA.hitbox.height
+                bx = spawn_positions[1][0] + ts // 2 - playerB.hitbox.width // 2
+                by = spawn_positions[1][1] + ts - playerB.hitbox.height
 
-            bx = spawn_positions[1][0] + ts // 2 - playerB.hitbox.width // 2
-            by = spawn_positions[1][1] + ts - playerB.hitbox.height
+                playerA.pos.x, playerA.pos.y = ax, ay
+                playerA.hitbox.topleft = (ax, ay)
+                playerA.rect.topleft = playerA.hitbox.topleft
+                playerA.vel = pygame.Vector2(0, 0)
+                playerA.on_ground = False
+                playerA.hp = playerA.max_hp
 
-            playerA.pos.x, playerA.pos.y = ax, ay
-            playerA.hitbox.topleft = (ax, ay)
-            playerA.rect.topleft = playerA.hitbox.topleft
-            playerA.vel = pygame.Vector2(0, 0)
-            playerA.on_ground = False
-            playerA.hp = playerA.max_hp
+                playerB.pos.x, playerB.pos.y = bx, by
+                playerB.hitbox.topleft = (bx, by)
+                playerB.rect.topleft = playerB.hitbox.topleft
+                playerB.vel = pygame.Vector2(0, 0)
+                playerB.on_ground = False
+                playerB.hp = playerB.max_hp
+            else:
+                playerA.pos.xy = (200, 200)
+                playerA.hitbox.topleft = (200, 200)
+                playerB.pos.xy = (200, 200)
+                playerB.hitbox.topleft = (200, 200)
 
-            playerB.pos.x, playerB.pos.y = bx, by
-            playerB.hitbox.topleft = (bx, by)
-            playerB.rect.topleft = playerB.hitbox.topleft
-            playerB.vel = pygame.Vector2(0, 0)
-            playerB.on_ground = False
-            playerB.hp = playerB.max_hp
-        else:
-            playerA.pos.xy = (200, 200)
-            playerA.hitbox.topleft = (200, 200)
-            playerB.pos.xy = (200, 200)
-            playerB.hitbox.topleft = (200, 200)
-
-        print("Solids:", len(world.solids))
-        print("Layers:", len(levels.current_level["layerInstances"]))
+            print("Solids:", len(world.solids))
+            print("Layers:", len(levels.current_level["layerInstances"]))
 
 
 
@@ -232,6 +295,18 @@ while running:
     playerA.draw(screen, hp_font)
     playerB.draw(screen, hp_font)
 
+    # Game over overlay
+    if game_over:
+        if gameover_image:
+            screen.blit(gameover_image, (0, 0))
+        else:
+            overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 160))
+            screen.blit(overlay, (0, 0))
+            msg = f"Game Over! Player {winner} won! Press R to restart"
+            txt = hp_font.render(msg, True, (255, 255, 255))
+            tr = txt.get_rect(center=(W // 2, H // 2))
+            screen.blit(txt, tr)
 
     pygame.display.flip()
 
