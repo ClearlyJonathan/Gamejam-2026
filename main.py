@@ -4,6 +4,7 @@ import src.playercontroller as pc
 from src.world import World
 from src.level_loader import build_test_level
 from src.stretcher import Stretcher
+from src.level_system import LevelSystem
 
 pygame.init()
 
@@ -35,6 +36,16 @@ playerB = pc.playerB
 
 # Stretch tool
 stretcher = Stretcher(speed=6)
+
+#Starte/Loade levelsene:
+levels = LevelSystem(
+    "ldtk.json",
+    "assets/tilesetResize.png")
+
+#Laster fÃ¸rste level
+levels.load_level("Level_0")
+
+
 
 running = True
 while running:
@@ -75,6 +86,7 @@ while running:
 
     # highlight selection so you know what you're stretching
     stretcher.draw_gizmo(screen)
+    levels.draw(screen)
 
     playerA.draw(screen)
     playerB.draw(screen)
